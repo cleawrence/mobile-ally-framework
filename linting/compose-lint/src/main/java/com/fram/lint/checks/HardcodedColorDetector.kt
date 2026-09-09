@@ -88,11 +88,13 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
             )
         ).setAndroidSpecific(true)
 
-        // Couleurs de statut couramment mal utilisées
-        private val STATUS_COLORS = setOf(
-            "Color.Red", "Color.Green", "Color.Yellow",
-            "Color(0xFFFF0000)", "Color(0xFF00FF00)", "Color(0xFFFF4444)",
-            "Color(0xFF4CAF50)", "Color(0xFFF44336)"
+        // Références qualifiées de statut couramment mal utilisées (Color.Xxx, sans appel)
+        private val STATUS_COLOR_REFS = setOf("Color.Red", "Color.Green", "Color.Yellow")
+
+        // Constructeurs Color(0xFFxxxxxx) représentant une couleur de statut courante
+        // (comparaison insensible à la casse sur le texte source réel du littéral hexadécimal)
+        private val STATUS_COLOR_HEX = setOf(
+            "0xFFFF0000", "0xFF00FF00", "0xFFFF4444", "0xFF4CAF50", "0xFFF44336"
         )
 
         // Fichiers de thème exclus du warning (normal d'y définir des couleurs)
@@ -100,7 +102,7 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
     }
 
     override fun getApplicableUastTypes(): List<Class<out UElement>> =
-        listOf(UCallExpression::class.java)
+        listOf(UCallExpression::class.java, UQualifiedReferenceExpression::class.java)
 
     override fun createUastHandler(context: JavaContext): UElementHandler =
         object : UElementHandler() {
@@ -121,13 +123,19 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
                 if (isColorConstructor) {
                     checkHardcodedColor(context, node)
                 }
+            }
 
-                // Détecter l'utilisation de Color.Red/Green comme couleur de statut
-                val sourceText = node.asSourceString()
-                val statusColor = STATUS_COLORS.firstOrNull { sourceText.contains(it) }
-                if (statusColor != null) {
-                    checkColorOnlyStatus(context, node, statusColor)
-                }
+            override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
+                // Détecter l'utilisation de Color.Red / Color.Green / Color.Yellow comme couleur
+                // de statut. Contrairement aux arguments nommés (voir les autres detectors),
+                // node.asSourceString() rend correctement une référence qualifiée comme "Color.Red"
+                // -- vérifié empiriquement, pas de piège de rendu ici.
+                val fileName = context.file.name
+                if (THEME_FILE_PATTERNS.any { fileName.contains(it, ignoreCase = true) }) return
+
+                val src = node.asSourceString().trim()
+                val statusColor = STATUS_COLOR_REFS.firstOrNull { it == src } ?: return
+                checkColorOnlyStatus(context, node, statusColor)
             }
 
             private fun checkHardcodedColor(context: JavaContext, node: UCallExpression) {
@@ -157,12 +165,19 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
                             "`Color($firstArg)` hardcodé — utiliser `MaterialTheme.colorScheme.xxx` pour garantir le contraste en dark mode. [SKILL-02 AA]"
                         )
                     }
+
+                    // Reconnaître aussi les teintes de statut courantes exprimées en hex brut
+                    val normalizedHex = firstArg.uppercase().removeSuffix("L")
+                    val matchedHex = STATUS_COLOR_HEX.firstOrNull { it.uppercase() == normalizedHex }
+                    if (matchedHex != null) {
+                        checkColorOnlyStatus(context, node, "Color($firstArg)")
+                    }
                 }
             }
 
             private fun checkColorOnlyStatus(
                 context: JavaContext,
-                node: UCallExpression,
+                node: UElement,
                 statusColor: String
             ) {
                 // Vérifier si une icône ou un texte d'erreur accompagne la couleur

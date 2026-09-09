@@ -550,6 +550,59 @@ class A11yLintChecksTest {
             .expectWarningCount(1)
     }
 
+    @Test
+    fun `Color Red seul sans icône ni texte d'erreur — doit signaler un warning`() {
+        // Régression : ISSUE_COLOR_ONLY_STATUS ne visitait que les UCallExpression, donc une
+        // référence qualifiée bare comme "Color.Red" (pas un appel) n'était jamais vue du tout.
+        lint()
+            .files(
+                *composeStubs(),
+                kotlin("""
+                    package test
+                    import androidx.compose.material3.Text
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+
+                    @Composable
+                    fun TestView() {
+                        Text("Erreur !", color = Color.Red) // ❌ Couleur seule
+                    }
+                """).indented()
+            )
+            .issues(HardcodedColorDetector.ISSUE_COLOR_ONLY_STATUS)
+            .run()
+            .expectWarningCount(1)
+    }
+
+    @Test
+    fun `Color Red doublé d'une icône — pas d'erreur`() {
+        lint()
+            .files(
+                *composeStubs(),
+                kotlin("""
+                    package test
+                    import androidx.compose.material3.Icon
+                    import androidx.compose.material3.Text
+                    import androidx.compose.material.icons.Icons
+                    import androidx.compose.material.icons.filled.Error
+                    import androidx.compose.foundation.layout.Box
+                    import androidx.compose.runtime.Composable
+                    import androidx.compose.ui.graphics.Color
+
+                    @Composable
+                    fun TestView() {
+                        Box {
+                            Icon(Icons.Default.Error, contentDescription = null)
+                            Text("Erreur : email invalide", color = Color.Red) // ✅ Doublé d'une icône
+                        }
+                    }
+                """).indented()
+            )
+            .issues(HardcodedColorDetector.ISSUE_COLOR_ONLY_STATUS)
+            .run()
+            .expectClean()
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     //  SKILL-03 — FixedTextSizeDetector
     // ══════════════════════════════════════════════════════════════════════
