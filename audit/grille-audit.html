@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRAM — Grille d'Audit Accessibilité Mobile</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface-raised: #1c2128;
+            --border: #30363d;
+            --border-light: #21262d;
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+            --blue: #58a6ff;
+            --green: #3fb950;
+            --green-dim: rgba(63,185,80,0.12);
+            --yellow: #d29922;
+            --yellow-dim: rgba(210,153,34,0.12);
+            --red: #f85149;
+            --red-dim: rgba(248,81,73,0.12);
+            --orange: #db6d28;
+            --purple: #bc8cff;
+            --accent: #58a6ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* ── Header ─────────────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1f2e 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 40px;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--blue), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .header .subtitle { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* ── Controls ───────────────────────────────────────── */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 40px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-wrap: wrap;
+        }
+        .controls label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .controls select, .controls input {
+            background: var(--surface-raised);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+        .controls select:focus, .controls input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(88,166,255,0.15);
+        }
+        .btn-export {
+            margin-left: auto;
+            background: var(--green);
+            color: #0d1117;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .btn-export:hover { opacity: 0.85; }
+
+        /* ── Score bar ──────────────────────────────────────── */
+        .score-bar {
+            display: flex;
+            gap: 20px;
+            padding: 20px 40px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .score-card {
+            flex: 1;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .score-card .ring {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        .score-card .ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+        .score-card .ring circle {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+        .score-card .info .label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .score-card .info .detail { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ── Audit grid ─────────────────────────────────────── */
+        .audit-container { padding: 24px 40px 60px; }
+
+        .skill-section {
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .skill-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        .skill-header:hover { background: var(--surface-raised); }
+        .skill-header h2 { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .skill-header .progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .skill-header .progress-bar {
+            width: 80px; height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .skill-header .progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .tag-a { background: rgba(88,166,255,0.15); color: var(--blue); }
+        .tag-aa { background: rgba(63,185,80,0.15); color: var(--green); }
+        .chevron { transition: transform 0.2s; font-size: 0.8rem; color: var(--text-muted); }
+        .skill-section.collapsed .chevron { transform: rotate(-90deg); }
+        .skill-section.collapsed .criteria-body { display: none; }
+
+        .criteria-body { background: var(--bg); }
+        .criterion-row {
+            display: grid;
+            grid-template-columns: 44px 70px 1fr 100px 120px;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.85rem;
+            transition: background 0.1s;
+        }
+        .criterion-row:hover { background: var(--surface); }
+        .criterion-row:last-child { border-bottom: none; }
+        .criterion-row input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: var(--green);
+            cursor: pointer;
+        }
+        .criterion-row .ref { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); }
+        .criterion-row .label-text { color: var(--text); }
+        .criterion-row .level { text-align: center; }
+        .criterion-row .status { text-align: center; }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .status-badge.conforme { background: var(--green-dim); color: var(--green); }
+        .status-badge.non-conforme { background: var(--red-dim); color: var(--red); }
+        .status-badge.na { background: rgba(139,148,158,0.12); color: var(--text-muted); }
+        .status-badge.non-teste { background: var(--yellow-dim); color: var(--yellow); }
+
+        select.status-select {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 0.75rem;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        /* ── Footer ─────────────────────────────────────────── */
+        .footer {
+            padding: 20px 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        @media print {
+            body { background: #fff; color: #000; }
+            .controls, .btn-export { display: none; }
+            .skill-section.collapsed .criteria-body { display: block; }
+            .criterion-row { border-bottom: 1px solid #ddd; }
+        }
+
+        @media (max-width: 768px) {
+            .header, .controls, .score-bar, .audit-container { padding-left: 16px; padding-right: 16px; }
+            .score-bar { flex-direction: column; }
+            .criterion-row { grid-template-columns: 36px 1fr 60px; font-size: 0.8rem; }
+            .criterion-row .ref, .criterion-row .status { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>FRAM — Grille d'Audit Accessibilité Mobile</h1>
+    <p class="subtitle">Référentiel RAAM 1.1 · WCAG 2.1 · EN 301 549 v3.2.1 · SwiftUI + Jetpack Compose</p>
+</div>
+
+<div class="controls">
+    <label for="filter-level">Niveau :</label>
+    <select id="filter-level" onchange="filterLevel(this.value)">
+        <option value="all">Tous (A + AA)</option>
+        <option value="a">Audit simplifié [A]</option>
+        <option value="aa">Audit complet [AA]</option>
+    </select>
+
+    <label for="filter-status">Statut :</label>
+    <select id="filter-status" onchange="filterStatus(this.value)">
+        <option value="all">Tous</option>
+        <option value="non-teste">Non testés</option>
+        <option value="conforme">Conformes</option>
+        <option value="non-conforme">Non conformes</option>
+        <option value="na">N/A</option>
+    </select>
+
+    <label for="app-name">Application :</label>
+    <input type="text" id="app-name" placeholder="Nom de l'app" style="width: 160px;">
+
+    <label for="audit-date">Date :</label>
+    <input type="date" id="audit-date">
+
+    <button class="btn-export" onclick="exportJSON()">📥 Exporter JSON</button>
+</div>
+
+<div class="score-bar">
+    <div class="score-card">
+        <div class="ring" id="ring-a" style="color: var(--blue);">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="24" stroke="var(--border)" /><circle id="circle-a" cx="28" cy="28" r="24" stroke="var(--blue)" stroke-dasharray="150.8" stroke-dashoffset="150.8" /></svg>
+            <span id="score-a-val">0</span>
+        </div>
+        <div class="info">
+            <div class="label">Audit simplifié [A]</div>
+            <div class="detail" id="score-a-detail">0 / 0 critères</div>
+        </div>
+    </div>
+    <div class="score-card">
+        <div class="ring" id="ring-aa" style="color: var(--green);">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="24" stroke="var(--border)" /><circle id="circle-aa" cx="28" cy="28" r="24" stroke="var(--green)" stroke-dasharray="150.8" stroke-dashoffset="150.8" /></svg>
+            <span id="score-aa-val">0</span>
+        </div>
+        <div class="info">
+            <div class="label">Audit complet [AA]</div>
+            <div class="detail" id="score-aa-detail">0 / 0 critères</div>
+        </div>
+    </div>
+    <div class="score-card">
+        <div class="ring" style="color: var(--purple);">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="24" stroke="var(--border)" /><circle id="circle-total" cx="28" cy="28" r="24" stroke="var(--purple)" stroke-dasharray="150.8" stroke-dashoffset="150.8" /></svg>
+            <span id="score-total-val">0</span>
+        </div>
+        <div class="info">
+            <div class="label">Score global</div>
+            <div class="detail" id="score-total-detail">0 / 0 critères</div>
+        </div>
+    </div>
+</div>
+
+<div class="audit-container" id="audit-container"></div>
+
+<div class="footer">
+    FRAM v1.0 · Framework Référence Accessibilité Mobile · Référentiel RAAM 1.1 · WCAG 2.1 · EN 301 549 v3.2.1
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+//  DONNÉES — Grille d'audit complète RAAM 1.1 mappée aux skills FRAM
+// ══════════════════════════════════════════════════════════════════════════════
+
+const AUDIT_DATA = [
+    {
+        id: "SKILL-01", name: "Éléments Graphiques", icon: "🖼️",
+        criteria: [
+            { ref: "1.1", text: "Élément graphique de décoration ignoré par les technologies d'assistance", level: "a" },
+            { ref: "1.2", text: "Élément graphique porteur d'information a une alternative textuelle accessible", level: "a" },
+            { ref: "1.3", text: "L'alternative textuelle est pertinente (pas de 'image de', 'icône de')", level: "a" },
+            { ref: "1.4", text: "CAPTCHA : l'alternative permet d'identifier sa nature et sa fonction", level: "a" },
+            { ref: "1.5", text: "CAPTCHA : il existe une alternative non graphique (audio, SMS)", level: "a" },
+            { ref: "1.6", text: "Les graphiques complexes ont une description détaillée accessible", level: "a" },
+            { ref: "1.7", text: "La description détaillée est pertinente et complète", level: "a" },
+            { ref: "1.8", text: "Les images-texte sont remplacées par du texte stylé natif", level: "aa" },
+            { ref: "1.9", text: "Les images légendées sont correctement restituées (label + caption combinés)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-02", name: "Couleurs et Contrastes", icon: "🎨",
+        criteria: [
+            { ref: "2.1", text: "L'information n'est pas donnée uniquement par la couleur (icône + texte en plus)", level: "a" },
+            { ref: "2.2.1", text: "Texte normal (< 18pt) : ratio de contraste ≥ 4.5:1", level: "aa" },
+            { ref: "2.2.2", text: "Texte large (≥ 18pt ou ≥ 14pt gras) : ratio de contraste ≥ 3:1", level: "aa" },
+            { ref: "2.2.3", text: "Contraste texte conforme en Dark Mode", level: "aa" },
+            { ref: "2.2.4", text: "Placeholders de champs : ratio ≥ 4.5:1", level: "aa" },
+            { ref: "2.3.1", text: "Bordures de champs de saisie : ratio ≥ 3:1 vs fond de page", level: "aa" },
+            { ref: "2.3.2", text: "Icônes informatives : ratio ≥ 3:1", level: "aa" },
+            { ref: "2.3.3", text: "Indicateurs de focus : ratio ≥ 3:1", level: "aa" },
+            { ref: "2.3.4", text: "Cases à cocher / boutons radio non cochés : contour visible ≥ 3:1", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-03", name: "Adaptation et Présentation", icon: "📐",
+        criteria: [
+            { ref: "3.1", text: "L'info n'est pas véhiculée uniquement par la forme, taille ou position", level: "a" },
+            { ref: "3.2", text: "Le contenu est accessible en portrait ET paysage", level: "aa" },
+            { ref: "3.3.1", text: "Le texte utilise des tailles adaptatives (Dynamic Type / sp)", level: "aa" },
+            { ref: "3.3.2", text: "Le texte reste lisible à la taille maximale système", level: "aa" },
+            { ref: "3.3.3", text: "Les dimensions utilisent @ScaledMetric (iOS) / sp (Android)", level: "aa" },
+            { ref: "3.4", text: "Pas de défilement horizontal à 200% de zoom (Reflow)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-04", name: "Tableaux et Listes", icon: "📊",
+        criteria: [
+            { ref: "4.1", text: "Les tableaux de données ont un rôle sémantique de tableau", level: "a" },
+            { ref: "4.2", text: "Les en-têtes de colonnes/lignes sont identifiés (heading/isHeader)", level: "a" },
+            { ref: "4.3", text: "Chaque cellule est associée à ses en-têtes (label contextuel)", level: "a" },
+            { ref: "4.4", text: "Le tableau a une description résumant son contenu", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-05", name: "Composants Interactifs", icon: "🔘",
+        criteria: [
+            { ref: "5.1", text: "Chaque composant interactif a un nom accessible (accessibilityLabel / contentDescription)", level: "a" },
+            { ref: "5.2", text: "Le nom accessible est pertinent et non vide", level: "a" },
+            { ref: "5.3", text: "Le rôle de chaque composant est défini (Role.Button, .Checkbox, etc.)", level: "a" },
+            { ref: "5.4", text: "L'état du composant est restitué (selected, expanded, disabled)", level: "a" },
+            { ref: "5.5", text: "Les changements d'état sont annoncés au lecteur d'écran", level: "a" },
+            { ref: "5.6", text: "Les actions custom sont fournies pour les gestes complexes (swipe-to-delete)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-06", name: "Éléments Obligatoires (Langue)", icon: "🌐",
+        criteria: [
+            { ref: "6.1", text: "La langue principale de l'application est déclarée", level: "a" },
+            { ref: "6.2", text: "Les changements de langue inline sont balisés (.accessibilityLanguage)", level: "a" },
+            { ref: "6.3", text: "Le titre de chaque écran est pertinent", level: "a" },
+            { ref: "6.4", text: "Le titre de chaque écran est unique", level: "a" },
+        ]
+    },
+    {
+        id: "SKILL-07", name: "Structuration", icon: "📑",
+        criteria: [
+            { ref: "7.1", text: "Les listes sont correctement structurées (List / LazyColumn)", level: "a" },
+            { ref: "7.2", text: "Les citations sont identifiées sémantiquement", level: "a" },
+            { ref: "7.3", text: "La hiérarchie des titres est cohérente (H1 > H2 > H3 / isHeader / heading)", level: "aa" },
+            { ref: "7.4", text: "Les titres sont pertinents et descriptifs", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-08", name: "Éléments Temporels", icon: "⏱️",
+        criteria: [
+            { ref: "8.1", text: "Audio seul : transcription textuelle accessible disponible", level: "a" },
+            { ref: "8.2", text: "Vidéo avec parole : sous-titres (CC) disponibles", level: "a" },
+            { ref: "8.3", text: "Vidéo pré-enregistrée : audiodescription disponible", level: "aa" },
+            { ref: "8.4", text: "Vidéo en direct : sous-titres en temps réel", level: "aa" },
+            { ref: "8.5.1", text: "Contenus auto-play : bouton Pause/Arrêt accessible", level: "a" },
+            { ref: "8.5.2", text: "Bouton Play/Pause : label adaptatif selon l'état", level: "a" },
+            { ref: "8.6.1", text: "Reduce Motion détecté et respecté", level: "a" },
+            { ref: "8.6.2", text: "Animations slide/spring remplacées par fade si Reduce Motion", level: "a" },
+            { ref: "8.6.3", text: "Aucun élément ne clignote plus de 3 fois par seconde", level: "a" },
+        ]
+    },
+    {
+        id: "SKILL-09", name: "Formulaires", icon: "📝",
+        criteria: [
+            { ref: "9.1", text: "Chaque champ a une étiquette visible et persistante (label, pas placeholder seul)", level: "a" },
+            { ref: "9.2", text: "Chaque étiquette de champ est pertinente", level: "a" },
+            { ref: "9.3", text: "Les champs obligatoires sont identifiés accessiblement", level: "a" },
+            { ref: "9.4", text: "Les messages d'erreur sont précis et annoncés au lecteur d'écran", level: "a" },
+            { ref: "9.5", text: "Les aides à la saisie (format, exemple) sont accessibles", level: "a" },
+            { ref: "9.6", text: "La saisie automatique respecte les finalités (.textContentType / keyboardType)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-10", name: "Navigation", icon: "🧭",
+        criteria: [
+            { ref: "10.1", text: "L'utilisateur est informé de sa position (titre d'écran annoncé)", level: "a" },
+            { ref: "10.2", text: "L'ordre de focus est cohérent et logique", level: "a" },
+            { ref: "10.3", text: "Les raccourcis ne créent pas de conflits avec les gestes TA", level: "a" },
+            { ref: "10.4", text: "La navigation est cohérente entre les écrans (même tab bar, même ordre)", level: "aa" },
+            { ref: "10.5", text: "L'indicateur de focus est visible (Switch Control / clavier)", level: "aa" },
+            { ref: "10.6", text: "Le focus n'est pas piégé (modales avec isModal, retour au déclencheur)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-11", name: "Consultation", icon: "👆",
+        criteria: [
+            { ref: "11.1", text: "L'utilisateur peut contrôler les limites de temps (session, countdown)", level: "a" },
+            { ref: "11.2", text: "Les contenus en mouvement sont contrôlables", level: "a" },
+            { ref: "11.3", text: "Les contenus clignotants sont contrôlables (< 3 Hz)", level: "a" },
+            { ref: "11.5.1", text: "Zone de touche minimum : 44×44pt (iOS) / 48×48dp (Android)", level: "aa" },
+            { ref: "11.5.2", text: "Espacement suffisant entre les cibles tactiles", level: "aa" },
+            { ref: "11.6", text: "Les erreurs de saisie sont récupérables (confirmation avant action irréversible)", level: "aa" },
+        ]
+    },
+    {
+        id: "SKILL-12", name: "Documentation & APIs", icon: "📚",
+        criteria: [
+            { ref: "12.1", text: "La documentation de l'app est elle-même accessible", level: "a" },
+            { ref: "12.2", text: "Les fonctionnalités d'accessibilité sont documentées dans l'app", level: "a" },
+            { ref: "12.3", text: "Les fonctionnalités d'accessibilité système sont supportées (VoiceOver, TalkBack, Voice Control, Switch)", level: "aa" },
+            { ref: "12.4", text: "Conformité aux APIs d'accessibilité de la plateforme", level: "aa" },
+        ]
+    }
+];
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════════════════════════════════════════════
+
+const state = {};
+
+function init() {
+    const container = document.getElementById('audit-container');
+    document.getElementById('audit-date').valueAsDate = new Date();
+
+    AUDIT_DATA.forEach(skill => {
+        skill.criteria.forEach(c => {
+            state[`${skill.id}-${c.ref}`] = { checked: false, status: 'non-teste' };
+        });
+
+        const section = document.createElement('div');
+        section.className = 'skill-section';
+        section.dataset.skill = skill.id;
+
+        const totalCriteria = skill.criteria.length;
+
+        section.innerHTML = `
+            <div class="skill-header" onclick="toggleSection('${skill.id}')">
+                <h2>${skill.icon} ${skill.id} — ${skill.name}</h2>
+                <div class="progress">
+                    <span class="progress-text" id="progress-${skill.id}">0 / ${totalCriteria}</span>
+                    <div class="progress-bar"><div class="progress-fill" id="bar-${skill.id}" style="width:0%; background: var(--blue);"></div></div>
+                    <span class="chevron">▼</span>
+                </div>
+            </div>
+            <div class="criteria-body">
+                ${skill.criteria.map(c => `
+                    <div class="criterion-row" data-level="${c.level}" data-status="non-teste" data-key="${skill.id}-${c.ref}">
+                        <input type="checkbox" id="chk-${skill.id}-${c.ref}" onchange="onCheck('${skill.id}', '${c.ref}', this.checked)" aria-label="Critère ${c.ref} conforme">
+                        <span class="ref">${c.ref}</span>
+                        <span class="label-text">${c.text}</span>
+                        <span class="level"><span class="tag ${c.level === 'a' ? 'tag-a' : 'tag-aa'}">[${c.level.toUpperCase()}]</span></span>
+                        <span class="status">
+                            <select class="status-select" onchange="onStatus('${skill.id}', '${c.ref}', this.value)" aria-label="Statut critère ${c.ref}">
+                                <option value="non-teste">Non testé</option>
+                                <option value="conforme">✅ Conforme</option>
+                                <option value="non-conforme">❌ Non conforme</option>
+                                <option value="na">N/A</option>
+                            </select>
+                        </span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(section);
+    });
+
+    // Restore from localStorage
+    const saved = localStorage.getItem('fram-audit-state');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            Object.assign(state, parsed);
+            Object.keys(state).forEach(key => {
+                const chk = document.getElementById(`chk-${key}`);
+                if (chk) chk.checked = state[key].checked;
+                const row = document.querySelector(`[data-key="${key}"]`);
+                if (row) {
+                    row.dataset.status = state[key].status;
+                    const sel = row.querySelector('.status-select');
+                    if (sel) sel.value = state[key].status;
+                }
+            });
+        } catch(e) {}
+    }
+    updateScores();
+}
+
+function toggleSection(skillId) {
+    const section = document.querySelector(`[data-skill="${skillId}"]`);
+    section.classList.toggle('collapsed');
+}
+
+function onCheck(skillId, ref, checked) {
+    const key = `${skillId}-${ref}`;
+    state[key].checked = checked;
+    if (checked) {
+        state[key].status = 'conforme';
+        const row = document.querySelector(`[data-key="${key}"]`);
+        row.dataset.status = 'conforme';
+        row.querySelector('.status-select').value = 'conforme';
+    }
+    save(); updateScores();
+}
+
+function onStatus(skillId, ref, value) {
+    const key = `${skillId}-${ref}`;
+    state[key].status = value;
+    state[key].checked = (value === 'conforme');
+    const row = document.querySelector(`[data-key="${key}"]`);
+    row.dataset.status = value;
+    document.getElementById(`chk-${key}`).checked = state[key].checked;
+    save(); updateScores();
+}
+
+function save() {
+    localStorage.setItem('fram-audit-state', JSON.stringify(state));
+}
+
+function updateScores() {
+    let totalA = 0, conformeA = 0, totalAA = 0, conformeAA = 0;
+    AUDIT_DATA.forEach(skill => {
+        let skillConf = 0;
+        skill.criteria.forEach(c => {
+            const s = state[`${skill.id}-${c.ref}`];
+            if (c.level === 'a') { totalA++; if (s.status === 'conforme') { conformeA++; skillConf++; } }
+            else { totalAA++; if (s.status === 'conforme') { conformeAA++; skillConf++; } }
+        });
+        const pct = Math.round((skillConf / skill.criteria.length) * 100);
+        const el = document.getElementById(`progress-${skill.id}`);
+        if (el) el.textContent = `${skillConf} / ${skill.criteria.length}`;
+        const bar = document.getElementById(`bar-${skill.id}`);
+        if (bar) {
+            bar.style.width = `${pct}%`;
+            bar.style.background = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--blue)' : pct > 0 ? 'var(--yellow)' : 'var(--border)';
+        }
+    });
+
+    const scoreA = totalA > 0 ? Math.round((conformeA / totalA) * 100) : 0;
+    const scoreAA = (totalA + totalAA) > 0 ? Math.round(((conformeA + conformeAA) / (totalA + totalAA)) * 100) : 0;
+    const scoreTotal = scoreAA;
+    const circumference = 2 * Math.PI * 24; // ~150.8
+
+    document.getElementById('score-a-val').textContent = scoreA;
+    document.getElementById('score-a-detail').textContent = `${conformeA} / ${totalA} critères`;
+    document.getElementById('circle-a').style.strokeDashoffset = circumference - (circumference * scoreA / 100);
+
+    document.getElementById('score-aa-val').textContent = scoreAA;
+    document.getElementById('score-aa-detail').textContent = `${conformeA + conformeAA} / ${totalA + totalAA} critères`;
+    document.getElementById('circle-aa').style.strokeDashoffset = circumference - (circumference * scoreAA / 100);
+
+    document.getElementById('score-total-val').textContent = scoreTotal;
+    document.getElementById('score-total-detail').textContent = `${conformeA + conformeAA} / ${totalA + totalAA} critères`;
+    document.getElementById('circle-total').style.strokeDashoffset = circumference - (circumference * scoreTotal / 100);
+}
+
+function filterLevel(val) {
+    document.querySelectorAll('.criterion-row').forEach(row => {
+        if (val === 'all') row.style.display = '';
+        else row.style.display = row.dataset.level === val ? '' : 'none';
+    });
+}
+
+function filterStatus(val) {
+    document.querySelectorAll('.criterion-row').forEach(row => {
+        if (val === 'all') row.style.display = '';
+        else row.style.display = row.dataset.status === val ? '' : 'none';
+    });
+}
+
+function exportJSON() {
+    const appName = document.getElementById('app-name').value || 'Application';
+    const auditDate = document.getElementById('audit-date').value;
+    const report = {
+        framework: "FRAM v1.0",
+        referentiel: "RAAM 1.1",
+        application: appName,
+        date: auditDate,
+        resultats: {}
+    };
+
+    AUDIT_DATA.forEach(skill => {
+        report.resultats[skill.id] = {
+            nom: skill.name,
+            criteres: skill.criteria.map(c => ({
+                ref: c.ref, text: c.text, level: c.level,
+                status: state[`${skill.id}-${c.ref}`].status
+            }))
+        };
+    });
+
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fram-audit-${appName.toLowerCase().replace(/\s+/g,'-')}-${auditDate}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+init();
+</script>
+</body>
+</html>

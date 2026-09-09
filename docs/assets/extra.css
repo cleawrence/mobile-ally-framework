@@ -1,0 +1,45 @@
+/* FRAM — Styles personnalisés MkDocs Material */
+
+/* ── Grid cards (landing page) ──────────────────────────────────────────── */
+.md-typeset .grid.cards > ul > li {
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+    border-color: var(--md-accent-fg-color);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* ── Tags de niveau ─────────────────────────────────────────────────────── */
+.text-blue { color: #58a6ff !important; }
+.text-green { color: #3fb950 !important; }
+.text-red { color: #f85149 !important; }
+.text-yellow { color: #d29922 !important; }
+
+/* ── Code tabs — hauteur minimale pour éviter le saut ───────────────────── */
+.md-typeset .tabbed-content {
+    min-height: 120px;
+}
+
+/* ── Admonitions personnalisées ──────────────────────────────────────────── */
+.md-typeset .admonition.tip {
+    border-left-color: #3fb950;
+}
+
+/* ── Checklist styling ──────────────────────────────────────────────────── */
+.md-typeset .task-list-indicator::before {
+    border-radius: 3px;
+}
+
+/* ── Footer nav ─────────────────────────────────────────────────────────── */
+.md-footer-nav__link {
+    transition: opacity 0.15s;
+}
+
+/* ── Print ──────────────────────────────────────────────────────────────── */
+@media print {
+    .md-header, .md-sidebar, .md-footer { display: none; }
+    .md-content { max-width: 100%; padding: 0; }
+}

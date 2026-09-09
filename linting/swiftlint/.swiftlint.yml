@@ -1,0 +1,214 @@
+# FRAM — SwiftLint Accessibilité Mobile
+# Version : 1.0 — Juillet 2026
+# Référence : mobile-a11y-framework/linting/swiftlint/
+#
+# Installation :
+#   1. brew install swiftlint
+#   2. Copier ce fichier à la racine de votre projet iOS (.swiftlint.yml)
+#   3. Xcode > Build Phases > Run Script :
+#      if which swiftlint > /dev/null; then swiftlint --config .swiftlint.yml; fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONFIGURATION GÉNÉRALE
+# ─────────────────────────────────────────────────────────────────────────────
+
+excluded:
+  - Pods
+  - .build
+  - DerivedData
+  - "**/*.generated.swift"
+  - "**/*Tests*.swift"     # Exclure les fichiers de test du linting a11y
+
+# Règles SwiftLint natives activées (bonnes pratiques générales)
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - closure_spacing
+  - literal_expression_end_indentation
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RÈGLES CUSTOM ACCESSIBILITÉ FRAM
+# Utilise le mécanisme "custom_rules" de SwiftLint (regex-based)
+# ─────────────────────────────────────────────────────────────────────────────
+
+custom_rules:
+
+  # ── SKILL-01 · Éléments Graphiques ──────────────────────────────────────
+
+  a11y_image_systemname_no_a11y:
+    name: "[FRAM SKILL-01] Image SF Symbol sans décision accessibilité"
+    message: >
+      Image(systemName:) doit avoir soit .accessibilityHidden(true) (décoration)
+      soit .accessibilityLabel('...') (information). Voir SKILL-01 [A] critère 1.1/1.2.
+      Réf: https://fram.internal/skills/skill-01
+    regex: 'Image\(systemName:\s*"[^"]+"\)(?![\s\S]{0,200}\.accessibilityHidden|[\s\S]{0,200}\.accessibilityLabel)'
+    severity: error
+    match_kinds:
+      - identifier
+      - keyword
+
+  a11y_label_redundant_prefix:
+    name: "[FRAM SKILL-01] Label redondant commençant par 'image de' ou 'icône'"
+    message: >
+      Ne pas commencer un accessibilityLabel par "image de", "icône de", "photo de".
+      VoiceOver annonce déjà le type. Ex: préférer "Chien qui court" à "image d'un chien qui court".
+      Voir SKILL-01 [A] critère 1.3.
+    regex: '\.accessibilityLabel\(\s*"(image de|icône de|icone de|photo de|image d''|illustration de)'
+    severity: warning
+    case_sensitive: false
+
+  a11y_image_name_as_label:
+    name: "[FRAM SKILL-01] Nom de fichier utilisé comme label"
+    message: >
+      Ne pas utiliser le nom de fichier comme accessibilityLabel (ex: "hero_banner", "img_profile").
+      Utiliser une description contextuelle. Voir SKILL-01 [A] critère 1.3.
+    regex: '\.accessibilityLabel\(\s*"[a-z0-9_-]+\.(png|jpg|jpeg|svg|webp|pdf)"'
+    severity: error
+    case_sensitive: false
+
+  # ── SKILL-05 · Composants Interactifs ───────────────────────────────────
+
+  a11y_tap_gesture_no_accessibility:
+    name: "[FRAM SKILL-05] .onTapGesture sans accessibilité"
+    message: >
+      .onTapGesture() rend un élément interactif mais invisible aux technologies d'assistance.
+      Utiliser un Button { } ou ajouter .accessibilityAddTraits(.isButton) + .accessibilityAction.
+      Voir SKILL-05 [A] critère 5.1. Réf: https://fram.internal/skills/skill-05
+    regex: '\.onTapGesture\s*\{(?![\s\S]{0,500}\.accessibilityAddTraits|[\s\S]{0,500}\.accessibilityAction|[\s\S]{0,500}\.accessibilityElement)'
+    severity: warning
+
+  a11y_button_image_only_no_label:
+    name: "[FRAM SKILL-05] Button avec Image uniquement sans accessibilityLabel"
+    message: >
+      Un Button contenant uniquement une Image doit avoir un .accessibilityLabel explicite.
+      Sans label, VoiceOver lira le nom du SF Symbol ou "bouton" sans contexte.
+      Voir SKILL-05 [A] critère 5.2.
+    regex: 'Button\s*\{[\s\n]*Image\('
+    severity: warning
+
+  a11y_empty_accessibility_label:
+    name: "[FRAM SKILL-05] accessibilityLabel vide"
+    message: >
+      .accessibilityLabel("") est invalide — VoiceOver ignorera l'élément ou lira quelque chose d'aléatoire.
+      Utiliser .accessibilityHidden(true) pour masquer, ou fournir un label descriptif.
+      Voir SKILL-05 [A] critère 5.2.
+    regex: '\.accessibilityLabel\(\s*""\s*\)'
+    severity: error
+
+  a11y_accessibility_value_missing_context:
+    name: "[FRAM SKILL-05] accessibilityValue sans accessibilityLabel"
+    message: >
+      .accessibilityValue() seul sans .accessibilityLabel risque d'être lu sans contexte.
+      Ex: VoiceOver lit "50%" sans savoir que c'est le volume. Toujours combiner avec un label.
+      Voir SKILL-05 [A] critère 5.3.
+    regex: '\.accessibilityValue\([^)]+\)(?![\s\S]{0,100}\.accessibilityLabel)(?<!\.accessibilityLabel[\s\S]{0,100})'
+    severity: warning
+
+  # ── SKILL-09 · Formulaires ───────────────────────────────────────────────
+
+  a11y_textfield_placeholder_only:
+    name: "[FRAM SKILL-09] TextField avec placeholder uniquement (pas de label visible)"
+    message: >
+      TextField(\"placeholder\", text:) utilise le premier argument comme placeholder iOS 16-.
+      Ce placeholder disparaît à la saisie → violation critère 9.1 [A].
+      Utiliser Form { TextField(text:) { Text(\"Label\") } } ou .accessibilityLabel().
+      Voir SKILL-09 [A] critère 9.1.
+    regex: 'TextField\(\s*"[^"]{3,}"\s*,\s*text:\s*\$[a-zA-Z]+\s*\)(?![\s\S]{0,100}\.accessibilityLabel)'
+    severity: warning
+
+  a11y_securefield_no_label:
+    name: "[FRAM SKILL-09] SecureField sans accessibilityLabel explicite"
+    message: >
+      SecureField doit avoir un .accessibilityLabel explicite décrivant le champ
+      (ex: "Mot de passe", "Confirmer le mot de passe").
+      Voir SKILL-09 [A] critère 9.1.
+    regex: 'SecureField\([^)]+\)(?![\s\S]{0,200}\.accessibilityLabel)'
+    severity: warning
+
+  a11y_error_text_missing_announcement:
+    name: "[FRAM SKILL-09] Message d'erreur sans annonce VoiceOver"
+    message: >
+      Un message d'erreur qui apparaît dynamiquement doit être annoncé via
+      UIAccessibility.post(notification: .announcement, argument: "Message d'erreur").
+      Un simple Text() qui apparaît n'est pas automatiquement lu.
+      Voir SKILL-09 [A] critère 9.4.
+    regex: '(isError|\.foregroundStyle\(.red\)|\.foregroundColor\(.red\))[\s\S]{0,500}Text\('
+    severity: warning
+
+  # ── SKILL-02 · Couleurs et Contrastes ───────────────────────────────────
+
+  a11y_hardcoded_hex_color:
+    name: "[FRAM SKILL-02] Couleur hexadécimale hardcodée"
+    message: >
+      Color(hex: \"#...\") est une couleur statique qui peut ne pas être conforme en dark mode.
+      Préférer Color(UIColor.label), Color(.primary), ou une couleur définie dans xcassets
+      avec variante Dark pour garantir le contraste WCAG 4.5:1.
+      Voir SKILL-02 [AA] critère 2.2.
+    regex: 'Color\(hex:\s*"#[0-9A-Fa-f]{3,8}"'
+    severity: warning
+
+  a11y_hardcoded_rgb_color:
+    name: "[FRAM SKILL-02] Couleur RGB hardcodée"
+    message: >
+      Color(red:green:blue:) est une couleur statique non adaptative.
+      Préférer les couleurs système (Color(.systemBlue)) ou les xcassets adaptatifs.
+      Voir SKILL-02 [AA] critère 2.2.
+    regex: 'Color\(red:\s*[\d.]+,\s*green:\s*[\d.]+,\s*blue:\s*[\d.]+'
+    severity: warning
+
+  a11y_color_only_status:
+    name: "[FRAM SKILL-02] Statut communiqué uniquement par couleur (.red / .green)"
+    message: >
+      Utiliser .foregroundStyle(.red) ou .foregroundStyle(.green) seul pour indiquer
+      un état (erreur/succès) est une violation du critère 2.1 [A].
+      Toujours doubler avec une icône et/ou un texte explicite.
+      Voir SKILL-02 [A] critère 2.1.
+    regex: '\.foregroundStyle\(\s*\.(red|green|orange)\s*\)(?![\s\S]{0,300}Image\(|[\s\S]{0,300}Label\()'
+    severity: warning
+
+  # ── SKILL-03 · Adaptation / Dynamic Type ────────────────────────────────
+
+  a11y_fixed_font_size:
+    name: "[FRAM SKILL-03] Taille de police fixe (ne s'adapte pas au Dynamic Type)"
+    message: >
+      .font(.system(size: N)) avec une taille fixe ne respecte pas le Dynamic Type.
+      Utiliser .font(.body), .font(.headline), etc., ou .font(.system(.body)) qui s'adapte.
+      Pour les tailles custom: .font(.system(size: N, weight: .bold, design: .default))
+      avec .dynamicTypeSize(.xSmall ... .xxxLarge).
+      Voir SKILL-03 [AA] critère 3.3.
+    regex: '\.font\(\.system\(size:\s*\d+'
+    severity: warning
+
+  a11y_fixed_frame_height_in_list:
+    name: "[FRAM SKILL-03] Hauteur fixe dans un List/ScrollView (bloque Dynamic Type)"
+    message: >
+      .frame(height: N) avec valeur fixe dans une liste peut tronquer le texte
+      aux grandes tailles Dynamic Type. Utiliser @ScaledMetric ou supprimer la hauteur fixe.
+      Voir SKILL-03 [AA] critère 3.3.
+    regex: '\.frame\(height:\s*\d+\.0?\)'
+    severity: warning
+
+  # ── SKILL-10 · Navigation ────────────────────────────────────────────────
+
+  a11y_modal_without_is_modal:
+    name: "[FRAM SKILL-10] Vue modale sans .accessibilityAddTraits(.isModal)"
+    message: >
+      Une vue présentée en modal (.sheet, .fullScreenCover) doit avoir .accessibilityAddTraits(.isModal)
+      sur son conteneur principal pour contraindre le focus VoiceOver.
+      Sans cela, VoiceOver peut atteindre le contenu derrière la modale.
+      Voir SKILL-10 [AA] critère 10.6.
+    regex: '\.(sheet|fullScreenCover)\s*\(isPresented:[\s\S]{0,1000}?\)\s*\{(?![\s\S]{0,2000}\.accessibilityAddTraits\(\.isModal\))'
+    severity: warning
+
+  # ── SKILL-11 · Consultation / Zones de touche ───────────────────────────
+
+  a11y_small_touch_target:
+    name: "[FRAM SKILL-11] Zone de touche potentiellement inférieure à 44pt"
+    message: >
+      .frame(width: N, height: M) avec des valeurs < 44 peut créer une zone de touche
+      insuffisante pour les utilisateurs avec des difficultés motrices.
+      Ajouter .frame(minWidth: 44, minHeight: 44) ou .contentShape(Rectangle())
+      pour agrandir la zone sans modifier le visuel.
+      Voir SKILL-11 [AA] critère 11.5 (Apple HIG: 44×44pt minimum).
+    regex: '\.frame\(width:\s*([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-3])'
+    severity: warning

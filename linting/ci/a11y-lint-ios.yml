@@ -1,0 +1,85 @@
+# FRAM — GitHub Actions : Lint Accessibilité iOS (SwiftLint)
+# Déclenché sur chaque PR modifiant des fichiers .swift
+
+name: FRAM A11y Lint — iOS
+
+on:
+  pull_request:
+    paths:
+      - "**/*.swift"
+      - ".swiftlint.yml"
+
+concurrency:
+  group: a11y-lint-ios-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  swiftlint-a11y:
+    name: "🔍 SwiftLint Accessibilité FRAM"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Installer SwiftLint
+        run: brew install swiftlint
+
+      - name: Vérifier la config FRAM
+        run: |
+          if [ ! -f .swiftlint.yml ]; then
+            echo "❌ .swiftlint.yml manquant — copier depuis mobile-a11y-framework/linting/swiftlint/"
+            exit 1
+          fi
+          echo "✅ .swiftlint.yml trouvé"
+
+      - name: Exécuter SwiftLint — règles a11y FRAM
+        run: |
+          set +e
+          swiftlint --config .swiftlint.yml --reporter json > swiftlint-report.json 2>&1
+          LINT_EXIT=$?
+
+          # Compter les violations par sévérité
+          ERRORS=$(cat swiftlint-report.json | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          errors = [v for v in data if v.get('severity') == 'Error']
+          warnings = [v for v in data if v.get('severity') == 'Warning']
+          print(f'ERRORS={len(errors)}')
+          print(f'WARNINGS={len(warnings)}')
+          # Filtrer uniquement les règles FRAM (commencent par a11y_)
+          fram_errors = [v for v in errors if v.get('rule_id', '').startswith('a11y_')]
+          fram_warnings = [v for v in warnings if v.get('rule_id', '').startswith('a11y_')]
+          print(f'FRAM_ERRORS={len(fram_errors)}')
+          print(f'FRAM_WARNINGS={len(fram_warnings)}')
+          " 2>/dev/null || echo "ERRORS=0")
+
+          echo "$ERRORS"
+          echo ""
+
+          # Résumé dans le PR
+          echo "## 🔍 FRAM Lint Accessibilité iOS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Métrique | Valeur |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Erreurs a11y FRAM | \`$FRAM_ERRORS\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Warnings a11y FRAM | \`$FRAM_WARNINGS\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$FRAM_ERRORS" -gt 0 ]; then
+            echo "❌ $FRAM_ERRORS violations d'accessibilité de niveau Erreur détectées."
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **$FRAM_ERRORS violations critiques** — cette PR ne peut pas être fusionnée." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ Aucune erreur d'accessibilité FRAM."
+            echo "✅ Aucune erreur d'accessibilité FRAM." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Archiver le rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swiftlint-a11y-report
+          path: swiftlint-report.json
+          retention-days: 30

@@ -1,0 +1,194 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# FRAM — Framework Référence Accessibilité Mobile
+# Site de documentation MkDocs Material
+# ──────────────────────────────────────────────────────────────────────────────
+
+site_name: FRAM — Accessibilité Mobile
+site_description: Framework de référence pour l'accessibilité mobile native (SwiftUI · Jetpack Compose · RAAM 1.1)
+site_url: https://fram.internal/
+site_author: Équipe Accessibilité
+
+# ── Repo ─────────────────────────────────────────────────────────────────────
+repo_name: mobile-a11y-framework
+repo_url: https://github.com/votre-org/mobile-a11y-framework
+edit_uri: edit/main/docs/
+
+# ── Thème Material ───────────────────────────────────────────────────────────
+theme:
+  name: material
+  language: fr
+  custom_dir: docs/overrides
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.svg
+
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Passer en mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Passer en mode clair
+
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  features:
+    # Navigation
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    # Recherche
+    - search.suggest
+    - search.highlight
+    - search.share
+    # Contenu
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    # Table des matières
+    - toc.follow
+    # Header
+    - header.autohide
+    - announce.dismiss
+
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: fontawesome/solid/note-sticky
+      tip: fontawesome/solid/lightbulb
+      warning: fontawesome/solid/triangle-exclamation
+      danger: fontawesome/solid/skull-crossbones
+      example: fontawesome/solid/flask
+      quote: fontawesome/solid/quote-left
+
+# ── Plugins ──────────────────────────────────────────────────────────────────
+plugins:
+  - search:
+      lang:
+        - fr
+        - en
+      separator: '[\s\-\.]+'
+  - tags:
+      tags_file: tags.md
+  - minify:
+      minify_html: true
+
+# ── Extensions Markdown ─────────────────────────────────────────────────────
+markdown_extensions:
+  # Formatting
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Code
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      auto_append:
+        - docs/includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+  # Content
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.tilde
+
+# ── CSS / JS personnalisé ───────────────────────────────────────────────────
+extra_css:
+  - assets/extra.css
+
+extra_javascript:
+  - assets/extra.js
+
+# ── Métadonnées ──────────────────────────────────────────────────────────────
+extra:
+  version:
+    provider: mike
+    default: stable
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/votre-org/mobile-a11y-framework
+  generator: false
+  status:
+    new: Nouveau
+    deprecated: Déprécié
+
+# ── Navigation ───────────────────────────────────────────────────────────────
+nav:
+  - Accueil: index.md
+  - Démarrage:
+    - guides/index.md
+    - Installation: guides/installation.md
+    - Premier audit: guides/premier-audit.md
+    - Intégration CI: guides/integration-ci.md
+  - Skills:
+    - skills/index.md
+    - 01 — Éléments Graphiques: skills/skill-01.md
+    - 02 — Couleurs et Contrastes: skills/skill-02.md
+    - 03 — Adaptation: skills/skill-03.md
+    - 04 — Tableaux et Listes: skills/skill-04.md
+    - 05 — Composants Interactifs: skills/skill-05.md
+    - 06 — Éléments Obligatoires: skills/skill-06.md
+    - 07 — Structuration: skills/skill-07.md
+    - 08 — Éléments Temporels: skills/skill-08.md
+    - 09 — Formulaires: skills/skill-09.md
+    - 10 — Navigation: skills/skill-10.md
+    - 11 — Consultation: skills/skill-11.md
+    - 12 — Documentation & APIs: skills/skill-12.md
+  - Linting:
+    - linting/index.md
+    - SwiftLint (iOS): linting/swiftlint.md
+    - Compose Lint (Android): linting/compose-lint.md
+    - Règles — Catalogue: linting/catalogue-regles.md
+  - Audit:
+    - audit/index.md
+    - Grille d'audit interactive: audit/grille-interactive.md
+    - Rapport de conformité: audit/rapport-conformite.md
+  - Référentiel:
+    - RAAM 1.1 — Mapping: referentiel-raam.md
+    - Glossaire: glossaire.md
+    - Tags: tags.md

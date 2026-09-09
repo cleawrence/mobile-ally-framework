@@ -1,0 +1,120 @@
+# FRAM — GitHub Actions : Lint Accessibilité Android (Compose Lint)
+# Déclenché sur chaque PR modifiant des fichiers .kt
+
+name: FRAM A11y Lint — Android
+
+on:
+  pull_request:
+    paths:
+      - "**/*.kt"
+      - "**/*.kts"
+
+concurrency:
+  group: a11y-lint-android-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  compose-lint-a11y:
+    name: "🔍 Compose Lint Accessibilité FRAM"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Vérifier le module FRAM Lint
+        run: |
+          if ! grep -q "fram-a11y-lint" settings.gradle.kts 2>/dev/null; then
+            echo "⚠️ Le module fram-a11y-lint n'est pas dans settings.gradle.kts"
+            echo "Ajouter : include(':fram-a11y-lint')"
+            # Ne pas bloquer — le lint standard Android peut quand même tourner
+          fi
+
+      - name: Exécuter Android Lint
+        run: |
+          ./gradlew lint --continue 2>&1 | tee lint-output.txt
+          echo "✅ Lint terminé"
+
+      - name: Extraire les violations FRAM
+        run: |
+          # Rechercher le rapport XML de lint
+          REPORT=$(find . -name "lint-results*.xml" -type f | head -1)
+
+          if [ -z "$REPORT" ]; then
+            echo "⚠️ Aucun rapport lint trouvé"
+            exit 0
+          fi
+
+          echo "📄 Rapport : $REPORT"
+
+          # Extraire les issues FRAM (IDs de nos détecteurs)
+          FRAM_ISSUES=(
+            "IconMissingContentDescription"
+            "EmptyContentDescription"
+            "RedundantContentDescriptionPrefix"
+            "ClickableWithoutSemantics"
+            "ClickableMissingRole"
+            "EmptySemanticsContentDescription"
+            "HardcodedAccessibilityColor"
+            "ColorOnlyStatusCommunication"
+            "FixedTextSizeDp"
+            "TextFieldMissingLabel"
+            "TextFieldEmptyLabel"
+            "MissingScreenTitle"
+            "SmallTouchTarget"
+          )
+
+          TOTAL_ERRORS=0
+          TOTAL_WARNINGS=0
+
+          echo "## 🔍 FRAM Lint Accessibilité Android" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Règle FRAM | Skill | Sévérité | Occurrences |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
+
+          for ISSUE_ID in "${FRAM_ISSUES[@]}"; do
+            COUNT=$(grep -c "id=\"$ISSUE_ID\"" "$REPORT" 2>/dev/null || echo "0")
+            if [ "$COUNT" -gt 0 ]; then
+              SEVERITY=$(grep "id=\"$ISSUE_ID\"" "$REPORT" | grep -o 'severity="[^"]*"' | head -1 | sed 's/severity="//;s/"//')
+              echo "| $ISSUE_ID | - | $SEVERITY | $COUNT |" >> $GITHUB_STEP_SUMMARY
+
+              if [ "$SEVERITY" = "Error" ]; then
+                TOTAL_ERRORS=$((TOTAL_ERRORS + COUNT))
+              else
+                TOTAL_WARNINGS=$((TOTAL_WARNINGS + COUNT))
+              fi
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total : $TOTAL_ERRORS erreurs, $TOTAL_WARNINGS warnings**" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$TOTAL_ERRORS" -gt 0 ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **$TOTAL_ERRORS violations critiques d'accessibilité** — cette PR ne peut pas être fusionnée." >> $GITHUB_STEP_SUMMARY
+            echo "❌ $TOTAL_ERRORS violations d'accessibilité de niveau Erreur."
+            exit 1
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Aucune erreur d'accessibilité FRAM." >> $GITHUB_STEP_SUMMARY
+            echo "✅ Aucune erreur d'accessibilité FRAM."
+          fi
+
+      - name: Archiver le rapport Lint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-lint-a11y-report
+          path: |
+            **/lint-results*.xml
+            **/lint-results*.html
+          retention-days: 30
