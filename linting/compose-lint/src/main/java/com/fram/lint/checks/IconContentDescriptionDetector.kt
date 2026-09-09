@@ -6,7 +6,6 @@ package com.fram.lint.checks
 
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.*
-import com.intellij.psi.PsiElement
 import org.jetbrains.uast.*
 
 @Suppress("UnstableApiUsage")
@@ -131,12 +130,11 @@ class IconContentDescriptionDetector : Detector(), Detector.UastScanner {
                 // Détecter les appels Icon() et AsyncImage()
                 if (methodName !in listOf("Icon", "AsyncImage", "Image")) return
 
-                val args = node.valueArguments
                 val contentDescArg = findNamedArgument(node, "contentDescription")
 
                 when {
                     // Cas 1 : contentDescription absent complètement
-                    contentDescArg == null && methodName == "Icon" -> {
+                    contentDescArg == null -> {
                         context.report(
                             ISSUE_ICON_MISSING_CONTENT_DESCRIPTION,
                             node,
@@ -146,13 +144,13 @@ class IconContentDescriptionDetector : Detector(), Detector.UastScanner {
                     }
 
                     // Cas 2 : contentDescription = "" (vide)
-                    contentDescArg != null -> {
+                    else -> {
                         val value = contentDescArg.asSourceString().trim()
                         if (value == "\"\"") {
                             context.report(
                                 ISSUE_EMPTY_CONTENT_DESCRIPTION,
                                 contentDescArg,
-                                context.getLocation(contentDescArg as PsiElement),
+                                context.getLocation(contentDescArg),
                                 "`contentDescription = \"\"` invalide — utiliser `null` pour un élément décoratif. [SKILL-01 A]"
                             )
                         }
@@ -166,7 +164,7 @@ class IconContentDescriptionDetector : Detector(), Detector.UastScanner {
                                 context.report(
                                     ISSUE_REDUNDANT_PREFIX_CONTENT_DESCRIPTION,
                                     contentDescArg,
-                                    context.getLocation(contentDescArg as PsiElement),
+                                    context.getLocation(contentDescArg),
                                     "contentDescription commence par \"$prefix\" — TalkBack annonce déjà le type. " +
                                     "Préférer \"${stringValue.replaceFirst(prefix, "", ignoreCase = true).trimStart()}\" [SKILL-01 A]"
                                 )
@@ -177,13 +175,24 @@ class IconContentDescriptionDetector : Detector(), Detector.UastScanner {
             }
 
             private fun findNamedArgument(call: UCallExpression, name: String): UExpression? {
+                // node.asSourceString() / UNamedExpression ne préservent pas de façon fiable le nom
+                // d'un argument nommé pour un appel Kotlin-vers-Kotlin (constaté empiriquement avec
+                // lint-api 31.5.0 : valueArguments perd l'association nom<->argument). La résolution
+                // du appelé + getArgumentForParameter() est la seule façon fiable de retrouver
+                // l'argument "contentDescription" quel que soit l'ordre d'écriture au site d'appel.
+                val resolved = call.resolve()
+                val paramIndex = resolved?.parameterList?.parameters?.indexOfFirst { it.name == name }
+                if (resolved != null && paramIndex != null && paramIndex >= 0) {
+                    return call.getArgumentForParameter(paramIndex)
+                }
+
+                // Repli si la résolution échoue (ex: bibliothèque absente du classpath d'analyse) :
+                // position habituelle de contentDescription dans Icon/Image/AsyncImage.
                 return call.valueArguments.firstOrNull {
                     (it as? UNamedExpression)?.name == name
                 } ?: call.valueArguments.getOrNull(
-                    // Position du contentDescription dans Icon() : 2e paramètre
                     when (call.methodName) {
-                        "Icon" -> 1
-                        "AsyncImage" -> 3
+                        "Icon", "Image", "AsyncImage" -> 1
                         else -> -1
                     }
                 )

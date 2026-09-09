@@ -72,31 +72,33 @@ class FixedTextSizeDetector : Detector(), Detector.UastScanner {
 
             override fun visitCallExpression(node: UCallExpression) {
                 val methodName = node.methodName ?: return
-                val source = node.asSourceString()
 
-                // Pattern 1 : Text(fontSize = N.dp)
-                if (methodName == "Text" || methodName == "BasicText") {
-                    if (source.contains("fontSize") && source.contains(".dp")) {
-                        context.report(
-                            ISSUE_FIXED_TEXT_SIZE_DP,
-                            node,
-                            context.getLocation(node),
+                // node.asSourceString() ne préserve pas le nom d'un argument nommé pour un appel
+                // Kotlin-vers-Kotlin (le "fontSize =" du site d'appel n'apparaît pas dans le texte
+                // reconstruit) : chercher "fontSize" dans la source ne trouve donc jamais rien.
+                // Résoudre l'appelé pour retrouver l'argument par paramètre.
+                if (methodName == "Text" || methodName == "BasicText" ||
+                    methodName == "TextStyle" || methodName == "SpanStyle"
+                ) {
+                    val fontSizeArg = findArgument(node, "fontSize")
+                    if (fontSizeArg != null && fontSizeArg.asSourceString().contains(".dp")) {
+                        val label = if (methodName == "Text" || methodName == "BasicText") {
                             "`fontSize` défini en `dp` — utiliser `sp` pour respecter le fontScale système. [SKILL-03 AA]"
-                        )
-                    }
-                }
-
-                // Pattern 2 : TextStyle(fontSize = N.dp)
-                if (methodName == "TextStyle" || methodName == "SpanStyle") {
-                    if (source.contains("fontSize") && source.contains(".dp")) {
-                        context.report(
-                            ISSUE_FIXED_TEXT_SIZE_DP,
-                            node,
-                            context.getLocation(node),
+                        } else {
                             "`TextStyle.fontSize` en `dp` — remplacer par `sp` : `fontSize = 14.sp`. [SKILL-03 AA]"
-                        )
+                        }
+                        context.report(ISSUE_FIXED_TEXT_SIZE_DP, node, context.getLocation(node), label)
                     }
                 }
+            }
+
+            private fun findArgument(call: UCallExpression, name: String): UExpression? {
+                val resolved = call.resolve()
+                val paramIndex = resolved?.parameterList?.parameters?.indexOfFirst { it.name == name }
+                if (resolved != null && paramIndex != null && paramIndex >= 0) {
+                    return call.getArgumentForParameter(paramIndex)
+                }
+                return call.valueArguments.firstOrNull { (it as? UNamedExpression)?.name == name }
             }
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {

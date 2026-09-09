@@ -112,10 +112,14 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
                 val fileName = context.file.name
                 if (THEME_FILE_PATTERNS.any { fileName.contains(it, ignoreCase = true) }) return
 
-                when (methodName) {
-                    "Color" -> {
-                        checkHardcodedColor(context, node)
-                    }
+                // `Color(...)` est un appel au constructeur d'une classe Kotlin : UAST rapporte
+                // methodName = "<init>" pour ces appels, jamais le nom "Color" -- ce detector n'a
+                // donc jamais pu se déclencher via `when (methodName) { "Color" -> ... }` sur du
+                // code réel. Vérifier isConstructorCall() + le nom de la classe résolue à la place.
+                val isColorConstructor = methodName == "Color" ||
+                        (node.kind == UastCallKind.CONSTRUCTOR_CALL && node.resolve()?.containingClass?.name == "Color")
+                if (isColorConstructor) {
+                    checkHardcodedColor(context, node)
                 }
 
                 // Détecter l'utilisation de Color.Red/Green comme couleur de statut
@@ -130,7 +134,11 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
                 val args = node.valueArguments
                 if (args.isEmpty()) return
 
-                val firstArg = args[0].asSourceString().trim()
+                // args[0].asSourceString() renvoie la valeur décimale du littéral ("4281545523"),
+                // pas la notation hexadécimale écrite au site d'appel ("0xFF333333") -- UAST
+                // recanonicalise les littéraux numériques. sourcePsi.text donne le texte source
+                // réel tel qu'écrit.
+                val firstArg = (args[0].sourcePsi?.text ?: args[0].asSourceString()).trim()
 
                 // Color(0xFFxxxxxx) — Long hex
                 if (firstArg.startsWith("0x") || firstArg.startsWith("0X")) {
