@@ -86,8 +86,7 @@ plugins:
         - fr
         - en
       separator: '[\s\-\.]+'
-  - tags:
-      tags_file: tags.md
+  - tags
   - minify:
       minify_html: true
 
@@ -140,9 +139,6 @@ markdown_extensions:
 # ── CSS / JS personnalisé ───────────────────────────────────────────────────
 extra_css:
   - assets/extra.css
-
-extra_javascript:
-  - assets/extra.js
 
 # ── Métadonnées ──────────────────────────────────────────────────────────────
 extra:
