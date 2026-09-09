@@ -108,6 +108,14 @@ struct InformativeElementPatterns: View {
             }
             .frame(width: 60, height: 60)
 
+            // ❌ Mauvais — nom de fichier utilisé comme label — VIOLATION [A] 1.3
+            Image("avatar_marie_dupont")
+                .resizable()
+                .clipShape(Circle())
+                .accessibilityLabel("avatar_marie_dupont.png")
+                // VoiceOver : "avatar_marie_dupont.png, image" — incompréhensible,
+                // aucune info sur le contenu réel de la photo
+
             // ✅ Bon — image décorative dans une carte (le titre de la carte dit tout)
             AsyncImage(url: URL(string: "https://example.com/article-hero.jpg")) { image in
                 image.resizable().scaledToFill()

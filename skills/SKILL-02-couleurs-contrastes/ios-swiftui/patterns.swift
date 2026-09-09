@@ -161,6 +161,14 @@ struct AdaptiveColorPatterns: View {
         }
     }
 
+    // ❌ Mauvais — couleur RGB hardcodée, même problème qu'avec hex — VIOLATION [AA] 2.2
+    var badHardcodedRGBColor: some View {
+        Text("Texte sombre")
+            .foregroundStyle(Color(red: 0.2, green: 0.2, blue: 0.2))
+        // Statique : ne change pas en dark mode, même risque de contraste insuffisant
+        // que Color(hex:) — préférer une couleur système ou un Asset Color adaptatif
+    }
+
     // ✅ Bon — couleur custom adaptative avec colorScheme
     var goodAdaptiveCustomColor: some View {
         Text("Texte personnalisé")

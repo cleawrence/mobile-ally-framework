@@ -38,6 +38,16 @@ struct ButtonPatterns: View {
         // VIOLATION [A] : nom non accessible
     }
 
+    // ❌ Mauvais — accessibilityLabel explicitement vide — VIOLATION [A] 5.2
+    var badExplicitEmptyLabelButton: some View {
+        Button(action: { deleteItem() }) {
+            Image(systemName: "trash")
+        }
+        .accessibilityLabel("")
+        // "" n'est pas un label valide : VoiceOver ignore l'élément ou lit un état aléatoire
+        // Utiliser .accessibilityHidden(true) pour masquer volontairement, sinon fournir un vrai label
+    }
+
     // ✅ Bon — bouton désactivé exposé correctement
     var disabledButton: some View {
         Button(action: { submitForm() }) {
