@@ -17,7 +17,7 @@ excluded:
   - .build
   - DerivedData
   - "**/*.generated.swift"
-  - "**/*Tests*.swift"     # Exclure les fichiers de test du linting a11y
+  - "**/tests/*.swift"     # Exclure les fichiers de test du linting a11y (dossier tests/, ex: ios-tests.swift)
 
 # Règles SwiftLint natives activées (bonnes pratiques générales)
 opt_in_rules:
@@ -53,18 +53,16 @@ custom_rules:
       Ne pas commencer un accessibilityLabel par "image de", "icône de", "photo de".
       VoiceOver annonce déjà le type. Ex: préférer "Chien qui court" à "image d'un chien qui court".
       Voir SKILL-01 [A] critère 1.3.
-    regex: '\.accessibilityLabel\(\s*"(image de|icône de|icone de|photo de|image d''|illustration de)'
+    regex: '(?i)\.accessibilityLabel\(\s*"(image de|icône de|icone de|photo de|image d''|illustration de)'
     severity: warning
-    case_sensitive: false
 
   a11y_image_name_as_label:
     name: "[FRAM SKILL-01] Nom de fichier utilisé comme label"
     message: >
       Ne pas utiliser le nom de fichier comme accessibilityLabel (ex: "hero_banner", "img_profile").
       Utiliser une description contextuelle. Voir SKILL-01 [A] critère 1.3.
-    regex: '\.accessibilityLabel\(\s*"[a-z0-9_-]+\.(png|jpg|jpeg|svg|webp|pdf)"'
+    regex: '(?i)\.accessibilityLabel\(\s*"[a-z0-9_-]+\.(png|jpg|jpeg|svg|webp|pdf)"'
     severity: error
-    case_sensitive: false
 
   # ── SKILL-05 · Composants Interactifs ───────────────────────────────────
 
@@ -185,7 +183,7 @@ custom_rules:
       .frame(height: N) avec valeur fixe dans une liste peut tronquer le texte
       aux grandes tailles Dynamic Type. Utiliser @ScaledMetric ou supprimer la hauteur fixe.
       Voir SKILL-03 [AA] critère 3.3.
-    regex: '\.frame\(height:\s*\d+\.0?\)'
+    regex: '\.frame\(height:\s*\d+(\.0)?\)'
     severity: warning
 
   # ── SKILL-10 · Navigation ────────────────────────────────────────────────
