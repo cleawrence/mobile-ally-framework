@@ -115,6 +115,19 @@ struct ColorOnlyViolationPatterns: View {
         }
         // ✅ Forme différente ET couleur daltonisme-friendly (bleu/orange vs rouge/vert)
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            badStatusBadge
+            goodStatusBadge
+            badErrorField
+            goodErrorField
+            badLink
+            goodLink
+            badPieChartLegend
+            goodChartLegend
+        }
+    }
 }
 
 // MARK: - 2. COULEURS ADAPTATIVES SYSTÈME [A] — Critères 2.2, 2.3
@@ -273,6 +286,16 @@ struct TextContrastPatterns: View {
             }
         }
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            maximumContrast
+            minimumConformantText
+            nonConformantText
+            placeholderContrast
+            textOnImage
+        }
+    }
 }
 
 // MARK: - 4. CONTRASTE COMPOSANTS UI [AA] — Critère 2.3
@@ -338,6 +361,16 @@ struct ComponentContrastPatterns: View {
         .buttonStyle(.plain)
         // [AA] ✅ La case à cocher est visible même non cochée (≥ 3:1)
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            conformantTextFieldBorder
+            nonConformantBorder
+            conformantIcon
+            nonConformantIcon
+            conformantCheckbox
+        }
+    }
 }
 
 // MARK: - 5. REDUCE CONTRAST / TRANSPARENCY [A]
@@ -378,6 +411,13 @@ struct AccessibilityPreferencePatterns: View {
                     : Color(hex: "#767676")             // Normal conforme
             )
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            adaptiveGlassmorphism
+            increaseContrastAdaptation
+        }
+    }
 }
 
 // MARK: - 6. DARK MODE — CONFORMITÉ COMPLÈTE [AA]
@@ -412,6 +452,13 @@ struct DarkModeContrastPatterns: View {
             .foregroundStyle(Color(hex: "#1A1A1A"))  // Très sombre en light ✅
             .background(Color(hex: "#2D2D2D"))        // En dark mode : texte ≈ fond → ❌
         // ratio #1A1A1A sur #2D2D2D = ~1.3:1 → VIOLATION [AA] 2.2
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            conformantInBothModes
+            badDarkModeColors
+        }
     }
 }
 
@@ -465,6 +512,10 @@ struct ColorblindFriendlyPatterns: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Avertissement : Vérifiez vos informations")
         }
+    }
+
+    var body: some View {
+        multiModalStatusIndicators
     }
 }
 

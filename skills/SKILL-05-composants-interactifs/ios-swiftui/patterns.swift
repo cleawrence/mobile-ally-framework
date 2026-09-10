@@ -78,6 +78,18 @@ struct ButtonPatterns: View {
         .accessibilityLabel("Voir le profil de Marie Dupont")
     }
 
+    var body: some View {
+        VStack(spacing: 16) {
+            goodContextualButton
+            badGenericButton
+            badEmptyLabelButton
+            badExplicitEmptyLabelButton
+            disabledButton
+            noRoleRedundancy
+            customTappableWithRole
+        }
+    }
+
     // Helpers
     func deleteItem() {}
     func submitForm() {}
@@ -134,6 +146,16 @@ struct TogglePatterns: View {
         .accessibilityValue(isEnabled ? "activé" : "désactivé")
         .accessibilityAddTraits(isEnabled ? [.isButton, .isSelected] : [.isButton])
         // Acceptable si Toggle natif n'est vraiment pas possible
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            standardToggle
+            toggleWithIcon
+            customStyledToggle
+            badFakeToggle
+            fixedFakeToggle
+        }
     }
 }
 
@@ -228,6 +250,14 @@ struct SliderPatterns: View {
             .accessibilityAddTraits(.updatesFrequently) // [AA] — contenu dynamique
             // VoiceOver annonce la valeur au focus, puis les mises à jour
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            volumeSlider
+            starRatingSlider
+            uploadProgressBar
+        }
+    }
 }
 
 // MARK: - 6. TABS [A] — Critères 5.4
@@ -267,6 +297,13 @@ struct TabPatterns: View {
         .pickerStyle(.segmented)
         .accessibilityLabel("Trier par")
         // VoiceOver : "Trier par, Date, sélectionné, 1 sur 3"
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            nativeTabView
+            segmentedPicker
+        }
     }
 }
 
@@ -345,6 +382,14 @@ struct GestureAlternativePatterns: View {
         }
     }
 
+    var body: some View {
+        VStack(spacing: 16) {
+            listWithSwipeAndAlternative
+            reorderableList
+            zoomableImage
+        }
+    }
+
     func delete(_ item: Item) { items.removeAll { $0.id == item.id } }
     func moveUp(at index: Int) { guard index > 0 else { return }; items.swapAt(index, index - 1) }
     func moveDown(at index: Int) { guard index < items.count - 1 else { return }; items.swapAt(index, index + 1) }
@@ -391,6 +436,15 @@ struct TouchTargetPatterns: View {
         Button("Annuler", action: { dismiss() })
             .buttonStyle(.borderless)
             .frame(minWidth: 44, minHeight: 44)
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            tooSmallButton
+            correctSizeButton
+            paddedButton
+            systemStyleButton
+        }
     }
 
     func dismiss() {}

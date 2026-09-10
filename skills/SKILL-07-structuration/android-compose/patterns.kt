@@ -71,7 +71,7 @@ fun ListPattern() {
                     )
                 }
             )
-            Divider()
+            HorizontalDivider() // Remplace Divider() (déprécié) depuis Material3 1.3
         }
     }
 }

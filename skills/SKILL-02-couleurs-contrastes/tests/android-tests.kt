@@ -1,8 +1,9 @@
 package com.fram.a11y.skill02.tests
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
-import com.fram.a11y.skill02.AccessibleErrorField
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import com.fram.a11y.skill02.GoodErrorFieldMultiModal
 import com.fram.a11y.skill02.GoodStatusBadge
 import org.junit.Rule
 import org.junit.Test
@@ -29,31 +30,28 @@ class Skill02CouleursContrastesTests {
     @Test
     fun errorField_hasErrorTextNotJustBorder() {
         composeTestRule.setContent {
-            AccessibleErrorField(
-                email = "invalid@",
-                hasError = true,
-                onEmailChange = {}
-            )
+            GoodErrorFieldMultiModal()
         }
 
-        // [A] Vérifie la présence du texte d'erreur, pas juste la bordure rouge
-        composeTestRule.onNodeWithText("Invalid email format")
+        // [A] Vérifie la présence du texte d'erreur, pas juste la bordure rouge (isError seul)
+        composeTestRule.onNodeWithText("L'adresse email doit contenir un @")
             .assertExists()
             .assertIsDisplayed()
-        
-        // Vérifie la présence de l'icône d'erreur via la sémantique ou le content description
-        composeTestRule.onNodeWithContentDescription("Error").assertExists()
     }
 
     @Test
-    fun noElementsConveyInfoByColorAlone() {
-        // Test global: les interactions interactives doivent avoir une sémantique appropriée
+    fun errorField_exposesErrorSemanticallyNotJustVisually() {
         composeTestRule.setContent {
-            AccessibleErrorField("test@test.com", false, {})
+            GoodErrorFieldMultiModal()
         }
-        
-        // Aucun élément d'erreur n'est affiché quand hasError est false
-        composeTestRule.onNodeWithText("Invalid email format").assertDoesNotExist()
+
+        // [A] L'erreur doit être exposée via la sémantique .error(...), pas seulement par
+        // la couleur/bordure rouge — c'est ce qui permet à TalkBack de l'annoncer.
+        composeTestRule.onNodeWithText("Email", substring = true)
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.Error,
+                "L'adresse email doit contenir un @"
+            ))
     }
 
     // MARK: - 2. CONTRASTE ET THEMES [AA]
