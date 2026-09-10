@@ -1,0 +1,63 @@
+# FRAM — Vérification du contenu iOS des skills
+# Lance SwiftLint (règles FRAM) et compile chaque patterns.swift contre le vrai SDK
+# iOS, exactement comme vérifié manuellement — empêche la régression des bugs de
+# contenu trouvés et corrigés en 2026-09 (structs sans body, API inexistantes, etc.)
+
+name: iOS Skills — Lint & Compile
+
+on:
+  pull_request:
+    paths:
+      - "skills/**/ios-swiftui/**"
+      - "linting/swiftlint/.swiftlint.yml"
+  push:
+    branches: [main, develop]
+    paths:
+      - "skills/**/ios-swiftui/**"
+      - "linting/swiftlint/.swiftlint.yml"
+
+concurrency:
+  group: ios-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swiftlint:
+    name: "🔍 SwiftLint — règles FRAM"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Installer SwiftLint
+        run: brew install swiftlint
+
+      - name: Lint des patterns iOS
+        run: |
+          # excluded: du .swiftlint.yml est résolu relativement à l'emplacement du
+          # fichier de config — le copier à la racine du repo comme le préconise
+          # la doc d'installation.
+          cp linting/swiftlint/.swiftlint.yml .swiftlint.yml
+          swiftlint lint --force-exclude skills
+          rm .swiftlint.yml
+
+  compile-check:
+    name: "🛠️ swiftc -typecheck — patterns.swift"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Typecheck chaque patterns.swift contre le SDK iOS simulator
+        run: |
+          SDK=$(xcrun --sdk iphonesimulator --show-sdk-path)
+          FAILED=0
+          for f in skills/SKILL-*/ios-swiftui/patterns.swift; do
+            echo "::group::$f"
+            if ! xcrun swiftc -typecheck -sdk "$SDK" -target arm64-apple-ios17.0-simulator "$f"; then
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $FAILED
