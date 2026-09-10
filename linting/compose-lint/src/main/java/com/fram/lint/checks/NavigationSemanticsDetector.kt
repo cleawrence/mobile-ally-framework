@@ -90,8 +90,11 @@ class NavigationSemanticsDetector : Detector(), Detector.UastScanner {
                 // donc jamais rien. Résoudre l'appelé pour retrouver l'argument par paramètre.
                 val topBarArg = findArgument(node, "topBar")
                 val contentArg = findArgument(node, "content")
-                val topBarSource = topBarArg?.asSourceString() ?: ""
-                val contentSource = contentArg?.asSourceString() ?: node.asSourceString()
+                // stripComments() : le texte reconstruit inclut les commentaires de fin de
+                // ligne — un commentaire pédagogique mentionnant "heading()" ou "topBar"
+                // produirait sinon un faux négatif. Voir SourceTextUtils.kt.
+                val topBarSource = stripComments(topBarArg?.asSourceString() ?: "")
+                val contentSource = stripComments(contentArg?.asSourceString() ?: node.asSourceString())
 
                 val hasTopBar = topBarArg != null
                 val hasTopAppBar = topBarSource.contains("TopAppBar") ||

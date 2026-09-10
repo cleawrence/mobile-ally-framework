@@ -164,7 +164,7 @@ class ClickableWithoutSemanticsDetector : Detector(), Detector.UastScanner {
             }
 
             private fun checkSemanticsContent(context: JavaContext, semanticsNode: UCallExpression) {
-                val body = semanticsNode.valueArguments.lastOrNull()?.asSourceString() ?: return
+                val body = stripComments(semanticsNode.valueArguments.lastOrNull()?.asSourceString() ?: return)
 
                 // Vérifier contentDescription = ""
                 val emptyDescriptionPattern = Regex("""contentDescription\s*=\s*""")
@@ -202,7 +202,10 @@ class ClickableWithoutSemanticsDetector : Detector(), Detector.UastScanner {
                     current = current?.uastParent
                     sb.append(current?.asSourceString()?.take(200) ?: "")
                 }
-                return sb.toString()
+                // Le texte reconstruit inclut les commentaires de fin de ligne du code source :
+                // un commentaire pédagogique mentionnant le mot-clé recherché (ex: "// Pas de
+                // semantics") produirait sinon un faux négatif. Voir SourceTextUtils.kt.
+                return stripComments(sb.toString())
             }
 
             private fun findParentComposable(node: UCallExpression): String? {

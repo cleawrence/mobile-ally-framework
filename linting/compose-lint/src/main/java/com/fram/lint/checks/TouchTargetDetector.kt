@@ -86,7 +86,11 @@ class TouchTargetDetector : Detector(), Detector.UastScanner {
 
             override fun visitCallExpression(node: UCallExpression) {
                 val methodName = node.methodName ?: return
-                val source = node.asSourceString()
+                // stripWhitespace() : le TestMode "Extra whitespace added" de lint-tests insère
+                // des espaces autour de chaque token (".size ( 24 . dp )" au lieu de
+                // ".size(24.dp)") — les regex ci-dessous matchent sur le texte débarrassé des
+                // espaces pour rester robustes à la mise en forme exacte. Voir SourceTextUtils.kt.
+                val source = stripWhitespace(node.asSourceString())
 
                 when (methodName) {
                     // Pattern 1 : IconButton / Button avec Modifier.size trop petit
@@ -158,7 +162,7 @@ class TouchTargetDetector : Detector(), Detector.UastScanner {
                 // Extraire la valeur
                 val args = node.valueArguments
                 if (args.isEmpty()) return
-                val sizeArg = args[0].asSourceString().trim()
+                val sizeArg = stripWhitespace(args[0].asSourceString())
                 val sizeMatch = Regex("""(\d+)\.dp""").find(sizeArg)
                 val sizeValue = sizeMatch?.groupValues?.get(1)?.toIntOrNull() ?: return
 
@@ -184,7 +188,9 @@ class TouchTargetDetector : Detector(), Detector.UastScanner {
                     current = current?.uastParent
                     sb.append(current?.asSourceString()?.take(300) ?: "")
                 }
-                return sb.toString()
+                // Voir SourceTextUtils.kt : le texte reconstruit inclut les commentaires de fin
+                // de ligne, qui pourraient sinon fausser les .contains() ci-dessus.
+                return stripComments(sb.toString())
             }
         }
 }

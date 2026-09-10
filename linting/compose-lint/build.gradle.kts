@@ -25,12 +25,12 @@ kotlin {
 
 dependencies {
     // API Lint Android — fournit Detector, Issue, IssueRegistry, etc.
-    compileOnly("com.android.tools.lint:lint-api:31.5.0")
-    compileOnly("com.android.tools.lint:lint-checks:31.5.0")
+    compileOnly("com.android.tools.lint:lint-api:32.4.0")
+    compileOnly("com.android.tools.lint:lint-checks:32.4.0")
 
     // Tests
-    testImplementation("com.android.tools.lint:lint-tests:31.5.0")
-    testImplementation("com.android.tools.lint:lint:31.5.0")
+    testImplementation("com.android.tools.lint:lint-tests:32.4.0")
+    testImplementation("com.android.tools.lint:lint:32.4.0")
     testImplementation("junit:junit:4.13.2")
 }
 
