@@ -1,0 +1,60 @@
+# FRAM — Publication du site de documentation sur GitHub Pages
+# Build le site MkDocs et le déploie à https://cleawrence.github.io/mobile-ally-framework/
+# à chaque push sur main.
+
+name: Pages — Deploy Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: "📚 Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer MkDocs Material
+        run: pip install mkdocs-material mkdocs-minify-plugin
+
+      - name: Build
+        run: mkdocs build --strict
+
+      - name: Uploader l'artefact Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: "🚀 Deploy"
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy vers GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

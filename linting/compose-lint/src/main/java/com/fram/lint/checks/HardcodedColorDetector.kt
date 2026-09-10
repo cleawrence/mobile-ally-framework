@@ -13,7 +13,7 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-02"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-02/"
 
         /**
          * SKILL-02 [AA] 2.2 — Couleur hardcodée hors MaterialTheme
