@@ -81,7 +81,11 @@ class FixedTextSizeDetector : Detector(), Detector.UastScanner {
                     methodName == "TextStyle" || methodName == "SpanStyle"
                 ) {
                     val fontSizeArg = findArgument(node, "fontSize")
-                    if (fontSizeArg != null && fontSizeArg.asSourceString().contains(".dp")) {
+                    // stripWhitespace() : le TestMode "Extra whitespace added" de lint-tests
+                    // insère des espaces autour de chaque token ("14 . dp" au lieu de "14.dp") —
+                    // comparer sur le texte débarrassé des espaces reste robuste à la mise en
+                    // forme exacte. Voir SourceTextUtils.kt.
+                    if (fontSizeArg != null && stripWhitespace(fontSizeArg.asSourceString()).contains(".dp")) {
                         val label = if (methodName == "Text" || methodName == "BasicText") {
                             "`fontSize` défini en `dp` — utiliser `sp` pour respecter le fontScale système. [SKILL-03 AA]"
                         } else {
@@ -103,7 +107,15 @@ class FixedTextSizeDetector : Detector(), Detector.UastScanner {
 
             override fun visitQualifiedReferenceExpression(node: UQualifiedReferenceExpression) {
                 // Pattern 3 : val textSize = 14.dp  (ensuite utilisé dans un Text)
-                val source = node.asSourceString()
+                //
+                // Ne pas matcher un noeud qui n'est que le receiver d'une chaîne plus longue
+                // (ex: le "14.dp" imbriqué dans "14.dp.value.sp") : ce cas est déjà couvert par
+                // le Pattern 1 ci-dessus (fontSize = 14.dp.value.sp), et le re-matcher ici
+                // produirait un double warning sur la même ligne.
+                val parent = node.uastParent
+                if (parent is UQualifiedReferenceExpression && parent.receiver == node) return
+
+                val source = stripWhitespace(node.asSourceString())
                 if (source.endsWith(".dp") && isInTextSizeContext(node)) {
                     context.report(
                         ISSUE_FIXED_TEXT_SIZE_DP,
