@@ -53,10 +53,14 @@ class SKILL03_AdaptationTests: XCTestCase {
         largeApp.launchArguments = ["-UIContentSizeCategory", "UICTContentSizeCategoryAccessibilityXXXL"]
         largeApp.launch()
         
-        // Vérifier qu'il n'y a pas de ScrollView horizontal ajouté pour accommoder le texte
+        // XCUIElement n'expose pas `contentSize` (propriété UIScrollView, pas accessible
+        // via XCUITest) : impossible de comparer directement la largeur du contenu à
+        // celle du cadre visible. Heuristique de repli : un scrollView plus large que
+        // l'écran lui-même indique un défilement horizontal ajouté pour accommoder le
+        // texte, contraire au Reflow attendu.
+        let screenWidth = largeApp.frame.width
         let horizontalScrollViews = largeApp.scrollViews.allElementsBoundByIndex.filter {
-            // Heuristique simple: un scrollView qui permet le défilement horizontal n'est pas souhaitable ici
-            $0.frame.width < $0.contentSize.width
+            $0.frame.width > screenWidth
         }
         
         XCTAssertTrue(horizontalScrollViews.isEmpty, "Il ne devrait pas y avoir de défilement horizontal à grande taille de texte. Utilisez le Reflow vertical.")

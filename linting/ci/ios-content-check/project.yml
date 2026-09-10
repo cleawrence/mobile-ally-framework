@@ -1,0 +1,179 @@
+# FRAM — Projet Xcode jetable (généré par xcodegen) pour compiler réellement les
+# fichiers skills/*/tests/ios-tests.swift dans un vrai target UI Testing.
+#
+# `swiftc -typecheck` seul (utilisé pour vérifier patterns.swift) ne résout pas
+# `import XCTest` / `XCUIApplication` / `XCUIElement` : ces symboles n'existent que
+# dans le contexte d'un target de test Xcode réel. Ce projet pointe directement sur
+# les vrais fichiers du repo (aucune copie) — voir la section `sources` de chaque
+# target *UITests ci-dessous.
+#
+# Un target par skill (plutôt qu'un seul target avec les 12 fichiers) : chaque
+# fichier s'appelle littéralement `ios-tests.swift` dans son dossier skill, et le
+# compilateur Swift refuse deux fichiers de même nom dans un même module (il s'en
+# sert pour désambiguïser les déclarations `private`). Contrairement à Kotlin, pas
+# de contournement côté module unique sans renommer les fichiers.
+#
+# Usage :
+#   xcodegen generate
+#   xcodebuild build-for-testing -project FRAMiOSContentCheck.xcodeproj \
+#     -scheme HostApp -destination 'generic/platform=iOS Simulator'
+
+name: FRAMiOSContentCheck
+
+options:
+  bundleIdPrefix: com.fram.verify
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+settings:
+  CODE_SIGNING_REQUIRED: NO
+  CODE_SIGNING_ALLOWED: NO
+  GENERATE_INFOPLIST_FILE: YES
+
+targets:
+  HostApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: HostApp
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.host
+
+  SKILL01UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-01-elements-graphiques/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill01
+    dependencies:
+      - target: HostApp
+
+  SKILL02UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-02-couleurs-contrastes/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill02
+    dependencies:
+      - target: HostApp
+
+  SKILL03UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-03-multimedia/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill03
+    dependencies:
+      - target: HostApp
+
+  SKILL04UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-04-tableaux-listes/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill04
+    dependencies:
+      - target: HostApp
+
+  SKILL05UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-05-composants-interactifs/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill05
+    dependencies:
+      - target: HostApp
+
+  SKILL06UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-06-elements-obligatoires/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill06
+    dependencies:
+      - target: HostApp
+
+  SKILL07UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-07-structuration/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill07
+    dependencies:
+      - target: HostApp
+
+  SKILL08UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-08-elements-temporels/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill08
+    dependencies:
+      - target: HostApp
+
+  SKILL09UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-09-formulaires/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill09
+    dependencies:
+      - target: HostApp
+
+  SKILL10UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-10-navigation/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill10
+    dependencies:
+      - target: HostApp
+
+  SKILL11UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-11-consultation/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill11
+    dependencies:
+      - target: HostApp
+
+  SKILL12UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: ../../../skills/SKILL-12-documentation/tests/ios-tests.swift
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.fram.verify.uitests.skill12
+    dependencies:
+      - target: HostApp
+
+schemes:
+  HostApp:
+    build:
+      targets:
+        HostApp: all
+        SKILL01UITests: [test]
+        SKILL02UITests: [test]
+        SKILL03UITests: [test]
+        SKILL04UITests: [test]
+        SKILL05UITests: [test]
+        SKILL06UITests: [test]
+        SKILL07UITests: [test]
+        SKILL08UITests: [test]
+        SKILL09UITests: [test]
+        SKILL10UITests: [test]
+        SKILL11UITests: [test]
+        SKILL12UITests: [test]
