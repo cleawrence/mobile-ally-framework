@@ -6,6 +6,7 @@
 name: iOS Skills — Lint & Compile
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "skills/**/ios-swiftui/**"

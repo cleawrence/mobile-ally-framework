@@ -5,6 +5,7 @@
 name: Compose Lint — Build & Test
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "linting/compose-lint/**"
