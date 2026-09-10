@@ -21,13 +21,20 @@ struct LanguageChangePattern: View {
             
             // ✅ Bon: Indication de la langue anglaise
             // Sans cela, VoiceOver lira "To be, or not to be" avec l'accent français (incompréhensible)
+            // Note : .accessibilityLanguage existe sur UIView/UIKit, pas sur View en SwiftUI —
+            // l'équivalent SwiftUI est .environment(\.locale, ...), qui est bien respecté par VoiceOver.
             Text("To be, or not to be, that is the question.")
-                .accessibilityLanguage("en-US")
-            
+                .environment(\.locale, Locale(identifier: "en-US"))
+
             // ✅ Bon: Terme technique anglais dans un texte français
-            Text("Pour valider, cliquez sur le bouton ") + 
-            Text("Submit").accessibilityLanguage("en-US") + 
-            Text(" en bas de page.")
+            // .environment(\.locale, ...) retourne "some View", pas Text — incompatible avec
+            // l'opérateur de concaténation Text + Text. On sépare donc les segments dans un HStack.
+            HStack(spacing: 4) {
+                Text("Pour valider, cliquez sur le bouton")
+                Text("Submit")
+                    .environment(\.locale, Locale(identifier: "en-US"))
+                Text("en bas de page.")
+            }
             
             // ❌ Mauvais: L'anglais sera lu par la voix française
             Text("Hello World, how are you?")
@@ -93,10 +100,10 @@ struct BilingualAppExample: View {
                     
                     HStack {
                         Text("Flight to London:")
-                            .accessibilityLanguage("en-GB")
+                            .environment(\.locale, Locale(identifier: "en-GB"))
                         Spacer()
                         Text("£250")
-                            .accessibilityLanguage("en-GB")
+                            .environment(\.locale, Locale(identifier: "en-GB"))
                     }
                     
                     HStack {
