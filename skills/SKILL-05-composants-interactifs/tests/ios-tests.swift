@@ -24,9 +24,9 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
 
     func test_allInteractiveElementsHaveAccessibilityLabel() {
         // Trouver tous les éléments interactifs (boutons, toggles, sliders)
-        let buttons = app.buttons.allElements
-        let switches = app.switches.allElements
-        let sliders = app.sliders.allElements
+        let buttons = app.buttons.allElementsBoundByIndex
+        let switches = app.switches.allElementsBoundByIndex
+        let sliders = app.sliders.allElementsBoundByIndex
 
         // Chaque bouton doit avoir un label non vide
         for button in buttons {
@@ -57,7 +57,7 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
 
     func test_buttonLabelsAreNotGeneric() {
         let forbiddenLabels = ["image", "icon", "button", "bouton", "ok", "tap", "click"]
-        let buttons = app.buttons.allElements
+        let buttons = app.buttons.allElementsBoundByIndex
 
         for button in buttons {
             let labelLower = button.label.lowercased()
@@ -87,7 +87,7 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
 
     func test_interactiveElementsHaveCorrectRole() {
         // Les toggles doivent être de type Switch
-        let switches = app.switches.allElements
+        let switches = app.switches.allElementsBoundByIndex
         for toggle in switches {
             XCTAssertEqual(
                 toggle.elementType, .switch,
@@ -101,11 +101,11 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
 
     // MARK: - [A] Critère 5.4 — Les changements d'état sont restitués
 
-    func test_toggleStateIsReflectedInAccessibilityValue() {
+    func test_toggleStateIsReflectedInAccessibilityValue() throws {
         // Trouver un interrupteur dans l'app
         let toggle = app.switches.firstMatch
         guard toggle.exists else {
-            XCTSkip("Aucun interrupteur trouvé dans l'app")
+            throw XCTSkip("Aucun interrupteur trouvé dans l'app")
         }
 
         let initialValue = toggle.value as? String
@@ -122,10 +122,10 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
 
     // MARK: - [A] Critère 5.5 — La valeur courante du slider est restituée
 
-    func test_sliderHasAccessibleValue() {
+    func test_sliderHasAccessibleValue() throws {
         let slider = app.sliders.firstMatch
         guard slider.exists else {
-            XCTSkip("Aucun curseur trouvé dans l'app")
+            throw XCTSkip("Aucun curseur trouvé dans l'app")
         }
 
         // Le slider doit avoir une valeur accessible
@@ -139,7 +139,7 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
     func test_allInteractiveElementsMeetMinimumTouchTarget() {
         let minimumSize: CGFloat = 44.0
 
-        let buttons = app.buttons.allElements
+        let buttons = app.buttons.allElementsBoundByIndex
         for button in buttons {
             let frame = button.frame
             // Note : XCUITest frame est en coordonnées logiques (points)
@@ -162,7 +162,7 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
         // la fonctionnalité accessibilityActivate ou un test manuel documenté
 
         // Vérification de base : les éléments interactifs existent et sont accessibles
-        let interactiveElements = app.buttons.allElements + app.switches.allElements
+        let interactiveElements = app.buttons.allElementsBoundByIndex + app.switches.allElementsBoundByIndex
         for element in interactiveElements {
             XCTAssertTrue(
                 element.isHittable,
@@ -177,7 +177,7 @@ class SKILL05InteractiveComponentsTests: XCTestCase {
         // Naviguer vers un écran avec des swipe actions
         // et vérifier qu'une action personnalisée (accessible) est disponible
 
-        let listCells = app.cells.allElements
+        let listCells = app.cells.allElementsBoundByIndex
         for cell in listCells {
             // Vérifier que des actions accessibles sont disponibles
             // (XCUITest ne peut pas directement tester les actions custom d'accessibilité
@@ -202,7 +202,7 @@ extension SKILL05InteractiveComponentsTests {
         if #available(iOS 17.0, *) {
             try app.performAccessibilityAudit(for: [
                 .contrast,       // Critère 2.2 — contraste
-                .textClipping,   // Critère 8 — présentation
+                .textClipped,   // Critère 8 — présentation
                 .hitRegion,      // Critère 5.7 — taille de cible [AA]
                 .sufficientElementDescription // Critères 5.1, 5.2 [A]
             ])
