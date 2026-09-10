@@ -37,13 +37,24 @@ def main():
 
     failures = []
     with tempfile.TemporaryDirectory() as tmp:
+        # Le Chromium headless de puppeteer n'a pas de sandbox utilisable dans
+        # les conteneurs CI (GitHub Actions, Docker...) faute des privilèges
+        # noyau requis -- --no-sandbox est le contournement documenté par
+        # mermaid-cli lui-même pour cet usage.
+        puppeteer_config = Path(tmp) / "puppeteer-config.json"
+        puppeteer_config.write_text('{"args": ["--no-sandbox"]}', encoding="utf-8")
+
         for path, index, source in diagrams:
             mmd_file = Path(tmp) / f"diagram.mmd"
             svg_file = Path(tmp) / f"diagram.svg"
             mmd_file.write_text(source, encoding="utf-8")
 
             result = subprocess.run(
-                ["npx", "--yes", "@mermaid-js/mermaid-cli", "-i", str(mmd_file), "-o", str(svg_file)],
+                [
+                    "npx", "--yes", "@mermaid-js/mermaid-cli",
+                    "-i", str(mmd_file), "-o", str(svg_file),
+                    "-p", str(puppeteer_config),
+                ],
                 capture_output=True,
                 text=True,
             )
