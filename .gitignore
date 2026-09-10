@@ -6,4 +6,5 @@ __pycache__/
 build/
 .gradle/
 .kotlin/
+*.xcodeproj/
 .claude/

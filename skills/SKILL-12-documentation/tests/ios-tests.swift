@@ -53,14 +53,13 @@ class DocumentationA11yTests: XCTestCase {
         // Test du SwitchControlFriendlyRow
         let rowElement = app.otherElements["Item Titre Exemple"] // Remplacer par un vrai label
         if rowElement.exists {
-            // [AA] Vérifier que l'élément a bien des actions custom exposées (Switch Control / VoiceOver Rotor)
-            let customActions = rowElement.customActions
-            XCTAssertTrue(customActions.count > 0, "L'élément devrait exposer des custom actions pour Switch Control")
-            
-            // Si possible, vérifier le nom de l'action
-            if let firstAction = customActions.first {
-                XCTAssertEqual(firstAction.name, "Supprimer")
-            }
+            // [AA] XCUIElement n'expose aucune API publique pour lister les
+            // accessibilityCustomActions d'un élément (contrairement à ce qu'un appel à
+            // `.customActions` laisserait penser — ce membre n'existe pas). Les custom
+            // actions (Switch Control / VoiceOver Rotor) ne sont vérifiables qu'à la main
+            // via VoiceOver, pas par XCUITest. On se limite donc à vérifier que l'élément
+            // est bien exposé à l'arbre d'accessibilité.
+            XCTAssertTrue(rowElement.isHittable, "L'élément avec custom actions doit être exposé à l'accessibilité")
         }
     }
     

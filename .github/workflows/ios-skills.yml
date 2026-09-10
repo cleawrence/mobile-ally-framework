@@ -1,7 +1,8 @@
 # FRAM — Vérification du contenu iOS des skills
-# Lance SwiftLint (règles FRAM) et compile chaque patterns.swift contre le vrai SDK
-# iOS, exactement comme vérifié manuellement — empêche la régression des bugs de
-# contenu trouvés et corrigés en 2026-09 (structs sans body, API inexistantes, etc.)
+# Lance SwiftLint (règles FRAM), compile chaque patterns.swift contre le vrai SDK
+# iOS, et compile chaque ios-tests.swift dans un vrai target UI Testing Xcode —
+# empêche la régression des bugs de contenu trouvés et corrigés en 2026-09 (structs
+# sans body, API inexistantes côté patterns.swift ET côté XCUITest, etc.)
 
 name: iOS Skills — Lint & Compile
 
@@ -10,12 +11,16 @@ on:
   pull_request:
     paths:
       - "skills/**/ios-swiftui/**"
+      - "skills/**/tests/ios-tests.swift"
       - "linting/swiftlint/.swiftlint.yml"
+      - "linting/ci/ios-content-check/**"
   push:
     branches: [main, develop]
     paths:
       - "skills/**/ios-swiftui/**"
+      - "skills/**/tests/ios-tests.swift"
       - "linting/swiftlint/.swiftlint.yml"
+      - "linting/ci/ios-content-check/**"
 
 concurrency:
   group: ios-skills-${{ github.ref }}
@@ -88,3 +93,30 @@ jobs:
             echo "::endgroup::"
           done
           exit $FAILED
+
+  xcuitest-compile-check:
+    name: "🛠️ xcodebuild build-for-testing — ios-tests.swift"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Installer xcodegen
+        run: brew install xcodegen
+
+      - name: Générer le projet Xcode jetable
+        # `swiftc -typecheck` seul ne résout pas import XCTest / XCUIApplication —
+        # ces symboles n'existent que dans un vrai target de test Xcode. Le projet
+        # généré pointe directement sur les vrais fichiers skills/*/tests/ios-tests.swift
+        # (aucune copie) — voir linting/ci/ios-content-check/project.yml.
+        working-directory: linting/ci/ios-content-check
+        run: xcodegen generate
+
+      - name: Compiler les 12 targets UI Testing pour de vrai
+        working-directory: linting/ci/ios-content-check
+        run: |
+          xcodebuild build-for-testing \
+            -project FRAMiOSContentCheck.xcodeproj \
+            -scheme HostApp \
+            -destination 'generic/platform=iOS Simulator'
