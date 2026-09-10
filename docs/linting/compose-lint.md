@@ -38,7 +38,7 @@ compose-lint/
     ```kotlin
     include(":fram-a11y-lint")
     project(":fram-a11y-lint").projectDir =
-        file("../mobile-a11y-framework/linting/compose-lint")
+        file("../mobile-ally-framework/linting/compose-lint")
     ```
 
 === "build.gradle.kts (module :app)"

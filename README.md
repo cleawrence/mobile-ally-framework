@@ -22,7 +22,7 @@ FRAM est un framework interne de référence pour l'**accessibilité mobile nati
 ## Structure
 
 ```
-mobile-a11y-framework/
+mobile-ally-framework/
 ├── skills/                          ← 12 skills × 5 fichiers = 60 fichiers
 │   ├── SKILL-01-elements-graphiques/
 │   │   ├── SKILL.md                 ← Doc : critères, À faire/éviter, checklists [A]/[AA]

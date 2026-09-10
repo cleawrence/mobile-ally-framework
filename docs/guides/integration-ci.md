@@ -28,7 +28,7 @@ graph LR
 Copier le fichier dans `.github/workflows/` :
 
 ```bash
-cp mobile-a11y-framework/linting/ci/a11y-lint-ios.yml .github/workflows/
+cp mobile-ally-framework/linting/ci/a11y-lint-ios.yml .github/workflows/
 ```
 
 !!! info "Comportement"
@@ -43,7 +43,7 @@ cp mobile-a11y-framework/linting/ci/a11y-lint-ios.yml .github/workflows/
 ## GitHub Actions — Android
 
 ```bash
-cp mobile-a11y-framework/linting/ci/a11y-lint-android.yml .github/workflows/
+cp mobile-ally-framework/linting/ci/a11y-lint-android.yml .github/workflows/
 ```
 
 !!! info "Comportement"
