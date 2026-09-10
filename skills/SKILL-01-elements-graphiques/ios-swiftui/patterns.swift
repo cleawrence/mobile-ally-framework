@@ -169,14 +169,15 @@ struct InformativeElementPatterns: View {
 
 // MARK: - 3. DESCRIPTION DÉTAILLÉE [A] — Critères 1.6, 1.7
 
+// Partagé entre DetailedDescriptionPatterns et DataTableView
+struct SalesData: Identifiable {
+    let id = UUID()
+    let month: String
+    let sales: Double
+}
+
 struct DetailedDescriptionPatterns: View {
     @State private var showDataTable = false
-
-    struct SalesData: Identifiable {
-        let id = UUID()
-        let month: String
-        let sales: Double
-    }
 
     let salesData = [
         SalesData(month: "Jan", sales: 45000),
@@ -199,8 +200,10 @@ struct DetailedDescriptionPatterns: View {
                 // VoiceOver : "Jan, 45 000 €" "Fév, 62 000 €" etc.
             }
             .frame(height: 200)
-            .chartAccessibilityLabel("Évolution des ventes — Janvier à Mai 2026")
+            .accessibilityLabel("Évolution des ventes — Janvier à Mai 2026")
             // Label global pour le graphique entier [A] ✅
+            // Note : chartAccessibilityLabel n'existe pas — accessibilityLabel(_:) standard de
+            // View fonctionne directement sur Chart, qui conforme à View.
 
             // ✅ Bon — bouton alternatif pour les données brutes
             Button("Voir les données du graphique en tableau") {
@@ -231,11 +234,6 @@ struct DetailedDescriptionPatterns: View {
 
 // Table alternative pour graphique
 struct DataTableView: View {
-    struct SalesData: Identifiable {
-        let id = UUID()
-        let month: String
-        let sales: Double
-    }
     let data: [SalesData]
 
     var body: some View {
@@ -252,8 +250,8 @@ struct DataTableView: View {
         }
     }
 
-    init(data: [InformativeElementPatterns.SalesDataItem] = []) {
-        self.data = []
+    init(data: [SalesData] = []) {
+        self.data = data
     }
 }
 

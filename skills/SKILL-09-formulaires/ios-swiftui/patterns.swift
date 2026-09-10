@@ -64,6 +64,16 @@ struct TextFieldLabelPatterns: View {
         }
         // VoiceOver : "Adresse email, champ de saisie" (icône ignorée)
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            goodLabeledField
+            nativeFormField
+            badPlaceholderOnly
+            badGenericLabel
+            fieldWithLeadingIcon
+        }
+    }
 }
 
 // MARK: - 2. CHAMPS OBLIGATOIRES [A] — Critère 9.3
@@ -124,6 +134,14 @@ struct RequiredFieldPatterns: View {
             }
             TextField("Email", text: $email)
                 .accessibilityLabel("Email, champ obligatoire")
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            globalLegendPattern
+            badAsteriskOnly
+            correctAsteriskPattern
         }
     }
 }
@@ -230,6 +248,15 @@ struct ErrorMessagePatterns: View {
             }
         }
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            goodEmailField
+            badVisualOnlyError
+            badGenericErrorMessage
+            errorSummaryPattern
+        }
+    }
 }
 
 // MARK: - 4. AIDE À LA SAISIE [A] — Critère 9.5
@@ -288,6 +315,15 @@ struct InputHintPatterns: View {
                 .textInputAutocapitalization(.characters)
         }
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            usernameWithHint
+            fieldWithVisibleHelp
+            dateFieldWithFormat
+            ibanFieldWithHelp
+        }
+    }
 }
 
 // MARK: - 5. SECUREFIELD — MOT DE PASSE [A]
@@ -341,6 +377,13 @@ struct PasswordFieldPattern: View {
                 // Label DISTINCT de "Mot de passe" pour éviter la confusion [A] 9.2
         }
     }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            accessiblePasswordField
+            confirmPasswordField
+        }
+    }
 }
 
 // MARK: - 6. PICKER / SELECT / DATEPICKER [A] — Critère 9.1
@@ -390,6 +433,14 @@ struct PickerPatterns: View {
             // VoiceOver : "Date de livraison souhaitée, 24 juillet 2026, sélecteur de date"
             .labelsHidden() // si label visible déjà dans le VStack
             .accessibilityLabel("Date de livraison souhaitée")
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            countryPicker
+            formPicker
+            datePicker
         }
     }
 }
@@ -471,6 +522,10 @@ struct AutocompletePatterns: View {
             }
         }
     }
+
+    var body: some View {
+        autocompleteForm
+    }
 }
 
 // MARK: - 8. REGROUPEMENT DE CHAMPS [A] — Critère 9.1
@@ -502,6 +557,10 @@ struct FieldGroupingPatterns: View {
                     // VoiceOver annonce "Adresse de facturation, en-tête" avant les champs
             }
         }
+    }
+
+    var body: some View {
+        addressGroup
     }
 }
 

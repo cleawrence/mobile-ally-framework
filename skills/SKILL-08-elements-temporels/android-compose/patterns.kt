@@ -94,7 +94,8 @@ fun AudioWithTranscriptView() {
             ) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = null)
             }
-            LinearProgressIndicator(progress = 0.3f, modifier = Modifier.weight(1f))
+            // Surcharge progress: () -> Float remplace progress: Float (déprécié) depuis Material3 1.3
+            LinearProgressIndicator(progress = { 0.3f }, modifier = Modifier.weight(1f))
         }
         
         // [A] Bouton pour afficher la transcription

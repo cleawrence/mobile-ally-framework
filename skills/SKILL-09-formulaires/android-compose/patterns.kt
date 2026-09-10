@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -314,7 +315,9 @@ fun AccessibleDropdownMenu() {
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor()
+                // Surcharge avec ExposedDropdownMenuAnchorType remplace menuAnchor() (déprécié)
+                // depuis Material3 1.3 — champ en lecture seule → PrimaryNotEditable
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth(),
             readOnly = true,
             value = selectedOption,

@@ -1,7 +1,7 @@
 package com.fram.a11y.skill08.tests
 
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.fram.a11y.skill08.AccessibleAutoPlayCarousel
 import com.fram.a11y.skill08.AudioWithTranscriptView
 import com.fram.a11y.skill08.ReduceMotionExample

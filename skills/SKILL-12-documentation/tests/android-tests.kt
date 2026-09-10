@@ -1,7 +1,8 @@
 package com.fram.a11y.skill12.tests
 
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import com.fram.a11y.skill12.AccessibilitySettingsScreen
 import com.fram.a11y.skill12.ComprehensiveSemanticsView
 import com.fram.a11y.skill12.SwitchAccessFriendlyListItem
@@ -40,6 +41,7 @@ class DocumentationA11yTests {
 
     // MARK: - 3. SWITCH ACCESS & CUSTOM ACTIONS [AA]
     
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun testSwitchAccessFriendlyListItemCustomActions() {
         var isDeleted = false

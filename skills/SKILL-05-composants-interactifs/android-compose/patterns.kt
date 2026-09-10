@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -249,7 +250,8 @@ fun AccessibleTabRow() {
     )
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    TabRow(selectedTabIndex = selectedTab) {
+    // PrimaryTabRow remplace TabRow (déprécié) depuis Material3 1.3
+    PrimaryTabRow(selectedTabIndex = selectedTab) {
         tabs.forEachIndexed { index, tab ->
             Tab(
                 selected = selectedTab == index,
@@ -451,6 +453,3 @@ sealed class UploadState {
     object Success : UploadState()
     data class Failure(val error: String = "") : UploadState()
 }
-
-// MARK: - HELPER : selectable (extension pour RadioButton)
-import androidx.compose.foundation.selection.selectable
