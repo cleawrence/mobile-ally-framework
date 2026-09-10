@@ -133,7 +133,11 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
                 val fileName = context.file.name
                 if (THEME_FILE_PATTERNS.any { fileName.contains(it, ignoreCase = true) }) return
 
-                val src = node.asSourceString().trim()
+                // stripWhitespace() : le TestMode "Extra whitespace added" de lint-tests insère
+                // des espaces autour de chaque token ("Color . Red" au lieu de "Color.Red") —
+                // comparer sur le texte débarrassé des espaces reste robuste à la mise en forme
+                // exacte. Voir SourceTextUtils.kt.
+                val src = stripWhitespace(node.asSourceString())
                 val statusColor = STATUS_COLOR_REFS.firstOrNull { it == src } ?: return
                 checkColorOnlyStatus(context, node, statusColor)
             }
@@ -204,7 +208,9 @@ class HardcodedColorDetector : Detector(), Detector.UastScanner {
             private fun getSurroundingCode(node: UElement, chars: Int): String {
                 var current: UElement? = node
                 repeat(8) { current = current?.uastParent }
-                return current?.asSourceString()?.take(chars) ?: ""
+                // Voir SourceTextUtils.kt : ne pas retirer les commentaires ici ferait qu'un
+                // commentaire mentionnant "Erreur"/"Icon(" ferait passer à tort ce check.
+                return stripComments(current?.asSourceString()?.take(chars) ?: "")
             }
         }
 }
