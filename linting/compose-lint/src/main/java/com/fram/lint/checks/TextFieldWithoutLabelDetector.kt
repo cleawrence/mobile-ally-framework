@@ -13,7 +13,7 @@ class TextFieldWithoutLabelDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-09"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-09/"
 
         /**
          * SKILL-09 [A] 9.1 — TextField/OutlinedTextField sans label

@@ -13,7 +13,7 @@ class TouchTargetDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-11"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-11/"
 
         // Material Design : zone de touche minimum 48×48dp
         // WCAG 2.5.5 (AAA) : 44×44 CSS px — sur mobile Android, 48dp est le standard

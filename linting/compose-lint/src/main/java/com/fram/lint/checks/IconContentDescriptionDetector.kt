@@ -13,7 +13,7 @@ class IconContentDescriptionDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-01"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-01/"
 
         /**
          * SKILL-01 [A] 1.2 — Icon() sans contentDescription
