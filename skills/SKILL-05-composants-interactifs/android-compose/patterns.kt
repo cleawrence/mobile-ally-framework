@@ -250,7 +250,8 @@ fun AccessibleTabRow() {
     )
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    TabRow(selectedTabIndex = selectedTab) {
+    // PrimaryTabRow remplace TabRow (déprécié) depuis Material3 1.3
+    PrimaryTabRow(selectedTabIndex = selectedTab) {
         tabs.forEachIndexed { index, tab ->
             Tab(
                 selected = selectedTab == index,

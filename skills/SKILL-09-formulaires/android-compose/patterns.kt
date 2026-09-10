@@ -315,7 +315,9 @@ fun AccessibleDropdownMenu() {
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor()
+                // Surcharge avec ExposedDropdownMenuAnchorType remplace menuAnchor() (déprécié)
+                // depuis Material3 1.3 — champ en lecture seule → PrimaryNotEditable
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 .fillMaxWidth(),
             readOnly = true,
             value = selectedOption,

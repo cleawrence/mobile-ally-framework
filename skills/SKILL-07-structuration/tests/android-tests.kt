@@ -1,7 +1,7 @@
 package com.fram.a11y.skill07.test
 
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.*
 import com.fram.a11y.skill07.*
 import org.junit.Rule
