@@ -38,3 +38,15 @@ jobs:
 
       - name: Build strict (échoue sur tout warning)
         run: mkdocs build --strict
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Valider les diagrammes Mermaid
+        # mkdocs build --strict ne détecte pas les diagrammes Mermaid cassés :
+        # le rendu se fait côté client dans le navigateur, pas au build. Fait
+        # tourner chaque diagramme dans le vrai moteur mermaid.js (Chromium
+        # headless) pour attraper les erreurs qu'un visiteur verrait.
+        run: python3 linting/ci/check-mermaid.py
