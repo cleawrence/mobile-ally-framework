@@ -1,0 +1,49 @@
+# FRAM — Vérification du contenu Android des skills
+# Compile skills/*/android-compose/patterns.kt et skills/*/tests/android-tests.kt
+# contre un vrai SDK Compose (AGP 9 / Compose BOM courant), via
+# linting/ci/android-content-check/ qui pointe directement sur skills/ sans copie.
+# Empêche la régression des bugs de contenu trouvés et corrigés en 2026-09
+# (imports manquants, API Compose Test inexistantes, tests référençant des
+# composables inconnus, etc.)
+
+name: Android Skills — Compile Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "skills/**/android-compose/**"
+      - "skills/**/tests/android-tests.kt"
+      - "linting/ci/android-content-check/**"
+  push:
+    branches: [main, develop]
+    paths:
+      - "skills/**/android-compose/**"
+      - "skills/**/tests/android-tests.kt"
+      - "linting/ci/android-content-check/**"
+
+concurrency:
+  group: android-skills-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile-check:
+    name: "🛠️ Compile patterns.kt + android-tests.kt"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Accepter les licences du SDK Android
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+
+      - name: Compile main + androidTest
+        working-directory: linting/ci/android-content-check
+        run: ./gradlew compileDebugKotlin compileDebugAndroidTestKotlin --console=plain

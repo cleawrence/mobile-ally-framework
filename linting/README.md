@@ -9,7 +9,7 @@
 Le linting statique FRAM détecte automatiquement les violations d'accessibilité les plus fréquentes **au moment de l'écriture du code**, avant même de compiler. Il couvre environ **40% des violations de niveau [A]** détectables statiquement.
 
 ```
-mobile-a11y-framework/linting/
+mobile-ally-framework/linting/
 ├── swiftlint/
 │   ├── .swiftlint.yml              ← Config principale + 17 règles custom (copier à la racine du projet iOS)
 │   └── README.md
@@ -71,7 +71,7 @@ mobile-a11y-framework/linting/
 brew install swiftlint
 
 # 2. Copier la config dans votre projet iOS
-cp mobile-a11y-framework/linting/swiftlint/.swiftlint.yml ./MonProjet/
+cp mobile-ally-framework/linting/swiftlint/.swiftlint.yml ./MonProjet/
 
 # 3. Ajouter à Xcode Build Phases
 # + New Run Script Phase :
@@ -84,7 +84,7 @@ cp mobile-a11y-framework/linting/swiftlint/.swiftlint.yml ./MonProjet/
 ```kotlin
 // settings.gradle.kts — inclure le module lint
 include(":fram-a11y-lint")
-project(":fram-a11y-lint").projectDir = file("../mobile-a11y-framework/linting/compose-lint")
+project(":fram-a11y-lint").projectDir = file("../mobile-ally-framework/linting/compose-lint")
 
 // build.gradle.kts (module app)
 dependencies {

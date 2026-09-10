@@ -9,7 +9,7 @@ tags:
 ## Structure du framework
 
 ```
-mobile-a11y-framework/
+mobile-ally-framework/
 ├── skills/            ← 12 skills × 5 fichiers
 ├── linting/           ← SwiftLint + Compose Lint
 ├── audit/             ← Grille d'audit interactive
@@ -31,7 +31,7 @@ brew install swiftlint
 ### Étape 2 : Copier la configuration
 
 ```bash
-cp mobile-a11y-framework/linting/swiftlint/.swiftlint.yml ./MonProjet/
+cp mobile-ally-framework/linting/swiftlint/.swiftlint.yml ./MonProjet/
 ```
 
 ### Étape 3 : Intégrer à Xcode
@@ -70,7 +70,7 @@ Compiler (++cmd+b++). Les violations apparaissent comme warnings/errors dans Xco
     ```kotlin
     include(":fram-a11y-lint")
     project(":fram-a11y-lint").projectDir =
-        file("../mobile-a11y-framework/linting/compose-lint")
+        file("../mobile-ally-framework/linting/compose-lint")
     ```
 
 === "settings.gradle (Groovy)"
@@ -78,7 +78,7 @@ Compiler (++cmd+b++). Les violations apparaissent comme warnings/errors dans Xco
     ```groovy
     include ':fram-a11y-lint'
     project(':fram-a11y-lint').projectDir =
-        new File("../mobile-a11y-framework/linting/compose-lint")
+        new File("../mobile-ally-framework/linting/compose-lint")
     ```
 
 ### Étape 2 : Déclarer la dépendance

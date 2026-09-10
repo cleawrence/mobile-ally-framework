@@ -1,0 +1,40 @@
+# FRAM — Build du site de documentation MkDocs
+# Valide que docs/ + mkdocs.yml produisent un site sans erreur à chaque changement.
+
+name: Docs — Build MkDocs
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+  push:
+    branches: [main, develop]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+
+concurrency:
+  group: docs-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "📚 mkdocs build --strict"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer MkDocs Material
+        run: pip install mkdocs-material mkdocs-minify-plugin
+
+      - name: Build strict (échoue sur tout warning)
+        run: mkdocs build --strict

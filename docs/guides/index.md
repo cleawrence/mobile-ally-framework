@@ -22,7 +22,7 @@ Bienvenue dans **FRAM** ! Ce guide vous accompagne de l'installation à votre pr
 ### 1. Cloner le framework
 
 ```bash
-git clone https://github.com/votre-org/mobile-a11y-framework.git
+git clone https://github.com/cleawrence/mobile-ally-framework.git
 ```
 
 ### 2. Configurer le linting
@@ -34,7 +34,7 @@ git clone https://github.com/votre-org/mobile-a11y-framework.git
     brew install swiftlint
 
     # Copier la config dans votre projet iOS
-    cp mobile-a11y-framework/linting/swiftlint/.swiftlint.yml ./MonProjetIOS/
+    cp mobile-ally-framework/linting/swiftlint/.swiftlint.yml ./MonProjetIOS/
     ```
 
     Puis dans Xcode : **Build Phases → + → New Run Script Phase** :
@@ -50,7 +50,7 @@ git clone https://github.com/votre-org/mobile-a11y-framework.git
     ```kotlin title="settings.gradle.kts"
     include(":fram-a11y-lint")
     project(":fram-a11y-lint").projectDir =
-        file("../mobile-a11y-framework/linting/compose-lint")
+        file("../mobile-ally-framework/linting/compose-lint")
     ```
 
     ```kotlin title="build.gradle.kts (module app)"

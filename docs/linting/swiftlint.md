@@ -15,7 +15,7 @@ Le fichier `.swiftlint.yml` contient **17 règles custom** ciblant les violation
 
 ```bash
 brew install swiftlint
-cp mobile-a11y-framework/linting/swiftlint/.swiftlint.yml ./MonProjetIOS/
+cp mobile-ally-framework/linting/swiftlint/.swiftlint.yml ./MonProjetIOS/
 ```
 
 ### Intégration Xcode

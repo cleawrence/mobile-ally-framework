@@ -1,0 +1,46 @@
+# FRAM — Tests du module Android Lint (compose-lint)
+# Compile les 7 détecteurs et lance leurs 17 tests unitaires contre la vraie API
+# Lint Android, exactement comme vérifié manuellement en 2026-09.
+
+name: Compose Lint — Build & Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "linting/compose-lint/**"
+  push:
+    branches: [main, develop]
+    paths:
+      - "linting/compose-lint/**"
+
+concurrency:
+  group: compose-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "🔍 ./gradlew test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Run tests
+        working-directory: linting/compose-lint
+        run: ./gradlew test --console=plain
+
+      - name: Archiver les résultats de test
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-lint-test-results
+          path: linting/compose-lint/build/reports/tests/test
+          retention-days: 30

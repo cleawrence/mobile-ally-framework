@@ -28,7 +28,7 @@ jobs:
       - name: Vérifier la config FRAM
         run: |
           if [ ! -f .swiftlint.yml ]; then
-            echo "❌ .swiftlint.yml manquant — copier depuis mobile-a11y-framework/linting/swiftlint/"
+            echo "❌ .swiftlint.yml manquant — copier depuis mobile-ally-framework/linting/swiftlint/"
             exit 1
           fi
           echo "✅ .swiftlint.yml trouvé"

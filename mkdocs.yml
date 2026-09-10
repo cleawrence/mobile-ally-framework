@@ -9,8 +9,8 @@ site_url: https://fram.internal/
 site_author: Équipe Accessibilité
 
 # ── Repo ─────────────────────────────────────────────────────────────────────
-repo_name: mobile-a11y-framework
-repo_url: https://github.com/votre-org/mobile-a11y-framework
+repo_name: mobile-ally-framework
+repo_url: https://github.com/cleawrence/mobile-ally-framework
 edit_uri: edit/main/docs/
 
 # ── Thème Material ───────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@ extra:
     default: stable
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/votre-org/mobile-a11y-framework
+      link: https://github.com/cleawrence/mobile-ally-framework
   generator: false
   status:
     new: Nouveau

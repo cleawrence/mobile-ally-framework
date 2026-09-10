@@ -10,9 +10,9 @@ tags:
 
 | Plateforme | Règles | Error | Warning |
 |---|---|---|---|
-| :material-apple: SwiftLint | 18 | 4 | 14 |
+| :material-apple: SwiftLint | 17 | 3 | 14 |
 | :material-android: Compose Lint | 13 issues (7 détecteurs) | 6 | 7 |
-| **Total** | **31** | **10** | **21** |
+| **Total** | **30** | **9** | **21** |
 
 ---
 
@@ -37,7 +37,6 @@ tags:
 | 15 | `a11y_error_text_missing_announcement` | SKILL-09 | 9.4 | `[A]` | Warning |
 | 16 | `a11y_modal_without_is_modal` | SKILL-10 | 10.6 | `[AA]` | Warning |
 | 17 | `a11y_small_touch_target` | SKILL-11 | 11.5 | `[AA]` | Warning |
-| 18 | `a11y_accessibility_value_missing_context` | SKILL-05 | 5.3 | `[A]` | Warning |
 
 ---
 
