@@ -84,19 +84,25 @@ class NavigationSemanticsDetector : Detector(), Detector.UastScanner {
 
                 if (methodName != "Scaffold") return
 
-                val source = node.asSourceString()
+                // node.asSourceString() ne préserve pas le nom d'un argument nommé pour un appel
+                // Kotlin-vers-Kotlin (ex: le "topBar =" du site d'appel n'apparaît pas dans le
+                // texte reconstruit) : chercher "topBar" dans la source du Scaffold ne trouve
+                // donc jamais rien. Résoudre l'appelé pour retrouver l'argument par paramètre.
+                val topBarArg = findArgument(node, "topBar")
+                val contentArg = findArgument(node, "content")
+                val topBarSource = topBarArg?.asSourceString() ?: ""
+                val contentSource = contentArg?.asSourceString() ?: node.asSourceString()
 
-                // Vérifier la présence d'un topBar avec un title
-                val hasTopBar = source.contains("topBar")
-                val hasTopAppBar = source.contains("TopAppBar") ||
-                        source.contains("CenterAlignedTopAppBar") ||
-                        source.contains("MediumTopAppBar") ||
-                        source.contains("LargeTopAppBar")
+                val hasTopBar = topBarArg != null
+                val hasTopAppBar = topBarSource.contains("TopAppBar") ||
+                        topBarSource.contains("CenterAlignedTopAppBar") ||
+                        topBarSource.contains("MediumTopAppBar") ||
+                        topBarSource.contains("LargeTopAppBar")
 
                 if (!hasTopBar) {
                     // Vérifier si le contenu du Scaffold contient un heading() semantics
-                    val hasHeading = source.contains("heading()") ||
-                            source.contains(".isHeader")
+                    val hasHeading = contentSource.contains("heading()") ||
+                            contentSource.contains(".isHeader")
 
                     if (!hasHeading) {
                         context.report(
@@ -109,10 +115,10 @@ class NavigationSemanticsDetector : Detector(), Detector.UastScanner {
                             "ou un `Text(..., modifier = Modifier.semantics { heading() })`. [SKILL-10 A]"
                         )
                     }
-                } else if (hasTopBar && !hasTopAppBar) {
+                } else if (!hasTopAppBar) {
                     // topBar est présent mais ne contient pas de TopAppBar reconnu
                     // Cela pourrait être un custom topBar sans titre — warning plus léger
-                    if (!source.contains("title") && !source.contains("Text(")) {
+                    if (!topBarSource.contains("title") && !topBarSource.contains("Text(")) {
                         context.report(
                             ISSUE_MISSING_SCREEN_TITLE,
                             node,
@@ -122,6 +128,15 @@ class NavigationSemanticsDetector : Detector(), Detector.UastScanner {
                         )
                     }
                 }
+            }
+
+            private fun findArgument(call: UCallExpression, name: String): UExpression? {
+                val resolved = call.resolve()
+                val paramIndex = resolved?.parameterList?.parameters?.indexOfFirst { it.name == name }
+                if (resolved != null && paramIndex != null && paramIndex >= 0) {
+                    return call.getArgumentForParameter(paramIndex)
+                }
+                return call.valueArguments.firstOrNull { (it as? UNamedExpression)?.name == name }
             }
         }
 }

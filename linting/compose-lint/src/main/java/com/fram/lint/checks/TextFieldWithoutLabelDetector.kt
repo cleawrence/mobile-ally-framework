@@ -99,15 +99,20 @@ class TextFieldWithoutLabelDetector : Detector(), Detector.UastScanner {
                 val methodName = node.methodName ?: return
                 if (methodName !in TEXTFIELD_COMPOSABLES) return
 
-                val sourceText = node.asSourceString()
+                // node.asSourceString() ne préserve pas le nom d'un argument nommé pour un appel
+                // Kotlin-vers-Kotlin (ex: rend "OutlinedTextField(\"x\", { ... })" au lieu de
+                // "OutlinedTextField(value = \"x\", ...)") : chercher "label" dans ce texte ne
+                // trouve donc jamais rien. Résoudre l'appelé pour retrouver l'argument par
+                // paramètre, quel que soit l'ordre d'écriture au site d'appel.
+                val labelArg = findArgument(node, "label")
+                val modifierArg = findArgument(node, "modifier")
 
-                // Vérifier la présence du paramètre label
-                val hasLabel = sourceText.contains("label") &&
-                        !sourceText.contains("label = null")
+                val hasLabel = labelArg != null && labelArg.asSourceString().trim() != "null"
 
-                // Vérifier la présence d'un accessibilityLabel via semantics
-                val hasSemanticsLabel = sourceText.contains("semantics") &&
-                        (sourceText.contains("contentDescription") || sourceText.contains("stateDescription"))
+                // Vérifier la présence d'un accessibilityLabel via semantics sur le modifier
+                val modifierSource = modifierArg?.asSourceString() ?: ""
+                val hasSemanticsLabel = modifierSource.contains("semantics") &&
+                        (modifierSource.contains("contentDescription") || modifierSource.contains("stateDescription"))
 
                 if (!hasLabel && !hasSemanticsLabel) {
                     // BasicTextField n'a pas de label natif — vérifier le contexte
@@ -133,8 +138,8 @@ class TextFieldWithoutLabelDetector : Detector(), Detector.UastScanner {
                 }
 
                 // Vérifier si le label est vide
-                val emptyLabelPattern = Regex("""label\s*=\s*\{\s*Text\s*\(\s*""\s*\)\s*\}""")
-                if (emptyLabelPattern.containsMatchIn(sourceText)) {
+                val emptyLabelPattern = Regex("""Text\s*\(\s*""\s*\)""")
+                if (labelArg != null && emptyLabelPattern.containsMatchIn(labelArg.asSourceString())) {
                     context.report(
                         ISSUE_EMPTY_LABEL,
                         node,
@@ -142,6 +147,15 @@ class TextFieldWithoutLabelDetector : Detector(), Detector.UastScanner {
                         "`$methodName` avec `label = { Text(\"\") }` vide — fournir un label descriptif. [SKILL-09 A]"
                     )
                 }
+            }
+
+            private fun findArgument(call: UCallExpression, name: String): UExpression? {
+                val resolved = call.resolve()
+                val paramIndex = resolved?.parameterList?.parameters?.indexOfFirst { it.name == name }
+                if (resolved != null && paramIndex != null && paramIndex >= 0) {
+                    return call.getArgumentForParameter(paramIndex)
+                }
+                return call.valueArguments.firstOrNull { (it as? UNamedExpression)?.name == name }
             }
         }
 }
