@@ -1,6 +1,12 @@
 package com.fram.a11y.skill05
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -13,6 +19,11 @@ import org.junit.Test
 // FRAM : Framework Référence Accessibilité Mobile — v1.0
 // Niveau A et AA
 // =============================================================================
+
+// Compose UI Test n'expose pas de matcher hasRole() prêt à l'emploi -- helper courant
+// dans les projets réels, basé sur SemanticsMatcher.expectValue().
+private fun hasRole(role: Role): SemanticsMatcher =
+    SemanticsMatcher.expectValue(SemanticsProperties.Role, role)
 
 class SKILL05ComposeAccessibilityTests {
 
@@ -63,9 +74,9 @@ class SKILL05ComposeAccessibilityTests {
             StandardButton(isFormValid = true) {}
         }
 
-        composeTestRule.onAllNodes(hasClickAction()).onEach { node ->
-            val description = node.fetchSemanticsNode()
-                .config.getOrElse(SemanticsProperties.ContentDescription) { listOf() }
+        val nodes = composeTestRule.onAllNodes(hasClickAction()).fetchSemanticsNodes()
+        for (node in nodes) {
+            val description = node.config.getOrElse(SemanticsProperties.ContentDescription) { listOf() }
                 .firstOrNull()?.lowercase() ?: ""
 
             assert(description !in forbiddenLabels) {
@@ -282,7 +293,7 @@ class SKILL05ComposeAccessibilityTests {
         // Le deuxième item doit avoir les deux actions (haut et bas)
         val secondItem = composeTestRule.onAllNodes(hasAnyChild(hasText("Deuxième")))[0]
         val customActions = secondItem.fetchSemanticsNode()
-            .config.getOrElse(SemanticsProperties.CustomActions) { listOf() }
+            .config.getOrElse(SemanticsActions.CustomActions) { listOf() }
 
         assert(customActions.any { it.label.contains("vers le haut") }) {
             "[RAAM 5.6][AA] — L'action 'vers le haut' est manquante"
@@ -292,8 +303,3 @@ class SKILL05ComposeAccessibilityTests {
         }
     }
 }
-
-// Extension utilitaire pour les tests
-private fun SemanticsNodeInteractionsProvider.onEach(
-    block: (SemanticsNodeInteraction) -> Unit
-): Unit = Unit // Placeholder — adapter selon les besoins du projet

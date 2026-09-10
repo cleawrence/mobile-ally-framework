@@ -1,10 +1,16 @@
 package com.fram.a11y.skill07.test
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.*
 import com.fram.a11y.skill07.*
 import org.junit.Rule
 import org.junit.Test
+
+// Compose UI Test n'expose pas de assertIsHeading() prêt à l'emploi -- vérifie la présence
+// de la clé sémantique Heading, posée par Modifier.semantics { heading() }.
+private fun SemanticsNodeInteraction.assertIsHeading(): SemanticsNodeInteraction =
+    assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Heading))
 
 class Skill07StructurationTest {
 

@@ -2,7 +2,6 @@ package com.fram.a11y.skill06
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import org.junit.Rule
 import org.junit.Test
