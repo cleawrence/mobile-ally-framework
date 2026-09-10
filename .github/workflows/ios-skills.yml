@@ -38,8 +38,34 @@ jobs:
           # fichier de config — le copier à la racine du repo comme le préconise
           # la doc d'installation.
           cp linting/swiftlint/.swiftlint.yml .swiftlint.yml
-          swiftlint lint --force-exclude skills
+          # `swiftlint lint` sort avec un code non-nul dès qu'il y a des violations
+          # (warnings compris) -- or les skills contiennent VOLONTAIREMENT des
+          # exemples ❌ à côté des ✅ à des fins pédagogiques, donc ça déclenche
+          # forcément des violations a11y_*. Exiger zéro violation n'a pas de sens
+          # ici. Ce qui compte : que chacune des 17 règles custom se déclenche
+          # toujours au moins une fois sur le corpus (garde-fou de non-régression
+          # sur le travail de vérification fait en 2026-09).
+          swiftlint lint --force-exclude --reporter json skills > swiftlint-report.json || true
           rm .swiftlint.yml
+
+      - name: Vérifier que les 17 règles a11y_ se déclenchent toujours
+        run: |
+          python3 - << 'EOF'
+          import json, re, sys
+
+          report = json.load(open("swiftlint-report.json"))
+          fired = {v["rule_id"] for v in report if v["rule_id"].startswith("a11y_")}
+
+          config = open("linting/swiftlint/.swiftlint.yml").read()
+          expected = set(re.findall(r"^  (a11y_\w+):", config, re.MULTILINE))
+
+          missing = expected - fired
+          print(f"{len(fired)}/{len(expected)} règles a11y_ déclenchées sur le corpus skills/")
+          if missing:
+              print(f"::error::{len(missing)} règle(s) ne se déclenchent plus : {sorted(missing)}")
+              sys.exit(1)
+          print("✅ Toutes les règles custom se déclenchent au moins une fois.")
+          EOF
 
   compile-check:
     name: "🛠️ swiftc -typecheck — patterns.swift"
