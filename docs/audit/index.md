@@ -44,7 +44,7 @@ graph TD
     A["1. Linting CI<br/>Automatique"] --> B["2. Tests UI<br/>XCUITest / Compose"]
     B --> C["3. Audit VoiceOver/TalkBack<br/>Manuel avec grille"]
     C --> D["4. Rapport de conformité<br/>Score [A] / [AA]"]
-    D --> E{Score [A] ≥ 90% ?}
+    D --> E{"Score [A] ≥ 90% ?"}
     E -->|Oui| F["✅ Release autorisée"]
     E -->|Non| G["🔧 Corriger les violations"]
     G --> A
