@@ -13,7 +13,7 @@ class FixedTextSizeDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-03"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-03/"
 
         /**
          * SKILL-03 [AA] 3.3 — Taille de texte en dp au lieu de sp

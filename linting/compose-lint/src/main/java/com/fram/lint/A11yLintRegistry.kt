@@ -59,7 +59,7 @@ class A11yLintRegistry : IssueRegistry() {
 
     override val vendor: Vendor = Vendor(
         vendorName = "FRAM — Framework Référence Accessibilité Mobile",
-        feedbackUrl = "https://fram.internal/issues",
+        feedbackUrl = "https://github.com/cleawrence/mobile-ally-framework/issues",
         contact = "a11y@votre-entreprise.fr"
     )
 }

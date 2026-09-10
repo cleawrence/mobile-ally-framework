@@ -13,7 +13,7 @@ class NavigationSemanticsDetector : Detector(), Detector.UastScanner {
 
     companion object {
 
-        private val SKILL_URL = "https://fram.internal/skills/skill-10"
+        private val SKILL_URL = "https://cleawrence.github.io/mobile-ally-framework/skills/skill-10/"
 
         /**
          * SKILL-10 [A] 10.1 — Scaffold/écran sans titre accessible
