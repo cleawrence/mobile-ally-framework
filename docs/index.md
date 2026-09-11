@@ -46,6 +46,15 @@ tags:
 
     [:octicons-arrow-right-24: Lancer un audit](audit/index.md)
 
+-   :material-robot-outline:{ .lg .middle } __Skill Claude Code__
+
+    ---
+
+    Les 12 thématiques condensées en **skill installable**
+    (`npx skills add`) pour un agent codant en SwiftUI/Compose.
+
+    [:octicons-arrow-right-24: Installer le skill](guides/installation.md#skill-claude-code-agents-ia)
+
 </div>
 
 ---

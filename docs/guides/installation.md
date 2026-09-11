@@ -116,6 +116,29 @@ Les résultats sont dans `app/build/reports/lint-results-debug.html`.
 
 ---
 
+## Skill Claude Code (agents IA)
+
+FRAM distribue aussi un [skill](https://code.claude.com/docs/en/skills) condensé — les 12 thématiques résumées en règles + un exemple SwiftUI/Compose vérifié chacune — pour qu'un agent (Claude Code, ou tout agent compatible) applique spontanément les bonnes pratiques d'accessibilité en écrivant du code, sans avoir à ouvrir les 12 `SKILL.md` un par un.
+
+### Installer
+
+```bash
+npx skills add https://github.com/cleawrence/mobile-ally-framework
+```
+
+L'outil [`skills`](https://skills.sh/) scanne tout le repo et propose `mobile-a11y` (les `SKILL.md` des 12 thématiques dans `skills/` sont ignorés — ce sont des docs, pas des skills agent).
+
+### Mettre à jour
+
+```bash
+npx skills update mobile-a11y
+```
+
+!!! note "Version condensée, pas la source de vérité"
+    Le skill est un résumé pour un usage agent. Pour l'exhaustivité — critères complets, patterns ❌ commentés, règles de lint — les [12 skills](../skills/index.md) de ce site restent la référence.
+
+---
+
 ## Vérification de l'installation
 
 Après installation, créez un fichier de test :
