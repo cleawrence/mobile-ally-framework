@@ -16,6 +16,7 @@ FRAM est un framework interne de référence pour l'**accessibilité mobile nati
 - **Linting statique** avec 17 règles SwiftLint + 7 détecteurs Android Lint
 - **Grille d'audit interactive** avec scoring [A] / [AA]
 - **Pipeline CI** GitHub Actions
+- **Skill Claude Code** installable (`npx skills add`) — condensé des 12 thématiques pour un agent codant en SwiftUI/Compose
 
 ---
 
@@ -23,6 +24,9 @@ FRAM est un framework interne de référence pour l'**accessibilité mobile nati
 
 ```
 mobile-ally-framework/
+├── .claude/skills/mobile-a11y/      ← Skill Claude Code (npx skills add — voir Démarrage rapide §5)
+│   └── SKILL.md
+│
 ├── skills/                          ← 12 skills × 5 fichiers = 60 fichiers
 │   ├── SKILL-01-elements-graphiques/
 │   │   ├── SKILL.md                 ← Doc : critères, À faire/éviter, checklists [A]/[AA]
@@ -137,6 +141,22 @@ dependencies { lintChecks(project(":fram-a11y-lint")) }
 ### 4. Auditer
 
 Ouvrir `audit/grille-audit.html` dans un navigateur. Cocher les critères, obtenir un score.
+
+### 5. Installer le skill Claude Code
+
+FRAM distribue aussi un [skill](https://code.claude.com/docs/en/skills) condensé (`.claude/skills/mobile-a11y/`) qui résume les 12 thématiques avec des patterns SwiftUI + Compose vérifiés, pour qu'un agent applique spontanément les bonnes pratiques d'accessibilité en écrivant du code — sans avoir à ouvrir les `SKILL.md` un par un.
+
+```bash
+npx skills add https://github.com/cleawrence/mobile-ally-framework
+```
+
+Pour le mettre à jour après une évolution du référentiel :
+
+```bash
+npx skills update mobile-a11y
+```
+
+C'est une version condensée, pas la source de vérité — pour l'exhaustivité (critères complets, patterns ❌ commentés, règles de lint), les `skills/SKILL-XX-*/` de ce repo restent la référence.
 
 ---
 
