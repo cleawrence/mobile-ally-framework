@@ -37,6 +37,27 @@ Accessibility is not a separate pass at the end. Every interactive element needs
 
 ---
 
+## Anti-patterns — scan for these before shipping
+
+- Icon-only button/control with no accessible label (§5, §11)
+- An image label starting with "Image de", "Icône de", "Photo de" (§1)
+- Error/success/selected state conveyed by color alone (§2)
+- A hardcoded fixed text size that ignores Dynamic Type / font scale (§3)
+- A placeholder used as a form field's only label (§9)
+- A touch target below 44×44pt (iOS) / 48×48dp (Android) (§5, §11)
+- A complex multi-finger gesture with no single-tap alternative (§11)
+- A data table with no row/column header association (§4)
+- Skipped heading levels, or a heading that's meaningless out of context (§7)
+- A floating error message with no programmatic link to its field (§9)
+- A screen with no title, or a title not announced on navigation (§6, §10)
+- Visual layout order diverging from reading/focus order (§10)
+- A swipe/long-press action with no accessible equivalent exposed (`accessibilityAction`/`customActions`) (§12)
+- Pre-recorded video/audio with no captions or transcript (§8)
+- A session timeout or auto-advancing carousel with no way to extend or pause it (§11)
+- **Using an accessibility API by name-guessing instead of verifying it exists** — `XCUIElement.customActions`, `XCUIElementQuery.allElements`, `XCUIAccessibilityAuditType.textClipping` and `XCUIElement.contentSize` all *sound* plausible and don't exist; every fabricated-API bug this skill's examples were built to avoid was exactly this failure mode. Grep the SDK or check the real symbol before writing an accessibility call you're not certain of.
+
+---
+
 ## 1. Graphics & images `[A]` `[AA]`
 
 Every image is either decorative or informative — never leave it unlabeled by default (screen readers announce raw filenames like `IMG_4821.png`).
