@@ -10,6 +10,27 @@ Distilled from FRAM (Framework Référence Accessibilité Mobile), a 12-theme re
 
 **`[A]`** = baseline conformance, must never be violated. **`[AA]`** = enhanced conformance, required for most public/enterprise apps.
 
+## Usage
+
+This skill also triggers automatically by context (see description above) — explicit invocation below is for when you want a specific theme or a standalone audit report instead.
+
+```
+/mobile-a11y                        # apply the cheat sheet below to the code you're currently writing/reviewing
+/mobile-a11y <theme>                # jump straight to one theme — name or number, French or English
+/mobile-a11y audit <path>           # read the file(s) at <path> and report real violations against all 12 themes
+/mobile-a11y audit                  # same, against the file(s) currently open/discussed in this conversation
+```
+
+Theme aliases (number, English, French — any of these match): `1` images/graphics/`images`/`graphiques` · `2` contrast/`couleurs`/`contrastes` · `3` adaptation/`dynamic-type`/`presentation` · `4` tables/`tableaux`/`listes` · `5` interactive/`composants`/`interactifs` · `6` required/`langue`/`titres` · `7` structure/`structuration`/headings · `8` media/`multimedia`/`temporels` · `9` forms/`formulaires` · `10` navigation/`focus` · `11` `consultation`/touch-targets/gestures · `12` documentation.
+
+**No arguments:** read the whole cheat sheet below and keep applying it for the rest of the task — don't produce a standalone report.
+
+**A theme argument:** jump to that section only, apply/review specifically against those rules, and reference the criterion levels (`[A]`/`[AA]`) in whatever you say or change.
+
+**`audit <path>` (or `audit` with no path):** read the given file(s) — or, with no path, the file(s) most recently discussed/edited in this conversation — and check them against every theme below. Report only concrete, real findings: `file:line`, which theme + criterion, `[A]`/`[AA]`, and a one-line fix. If a theme doesn't apply to that file (e.g. no images in a pure logic file), skip it silently — don't pad the report with non-findings.
+
+---
+
 ## Core principle
 
 Accessibility is not a separate pass at the end. Every interactive element needs a name (label), a role, and — if stateful — a value that updates. Every image needs a decision: decorative (hide it) or informative (label it). Every layout needs to survive larger text and screen reader linear reading order.
