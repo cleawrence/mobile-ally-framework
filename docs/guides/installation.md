@@ -128,6 +128,16 @@ npx skills add https://github.com/cleawrence/mobile-ally-framework
 
 L'outil [`skills`](https://skills.sh/) scanne tout le repo et propose `mobile-a11y` (les `SKILL.md` des 12 thématiques dans `skills/` sont ignorés — ce sont des docs, pas des skills agent).
 
+### Utiliser
+
+Le skill se déclenche automatiquement selon le contexte (dès que vous écrivez du SwiftUI/Compose), mais peut aussi être invoqué explicitement :
+
+```
+/mobile-a11y                # applique le pense-bête au code en cours
+/mobile-a11y formulaires    # va directement à une thématique (nom ou numéro, FR ou EN)
+/mobile-a11y audit <path>   # audite un fichier contre les 12 thématiques, remonte les vraies violations
+```
+
 ### Mettre à jour
 
 ```bash
