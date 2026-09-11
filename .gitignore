@@ -7,4 +7,10 @@ build/
 .gradle/
 .kotlin/
 *.xcodeproj/
-.claude/
+
+# Ignore local Claude Code tooling state, but track the project-scoped skill we
+# distribute so `npx skills add` (and anyone who opens this repo in Claude Code)
+# can find it.
+.claude/*
+!.claude/skills/
+!.claude/skills/**
