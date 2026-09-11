@@ -27,7 +27,38 @@ Theme aliases (number, English, French — any of these match): `1` images/graph
 
 **A theme argument:** jump to that section only, apply/review specifically against those rules, and reference the criterion levels (`[A]`/`[AA]`) in whatever you say or change.
 
-**`audit <path>` (or `audit` with no path):** read the given file(s) — or, with no path, the file(s) most recently discussed/edited in this conversation — and check them against every theme below. Report only concrete, real findings: `file:line`, which theme + criterion, `[A]`/`[AA]`, and a one-line fix. If a theme doesn't apply to that file (e.g. no images in a pure logic file), skip it silently — don't pad the report with non-findings.
+**`audit <path>` (or `audit` with no path):** read the given file(s) — or, with no path, the file(s) most recently discussed/edited in this conversation — and check them against every theme below. Report only concrete, real findings. If a theme doesn't apply to that file (e.g. no images in a pure logic file), skip it silently — don't pad the report with non-findings.
+
+**Baseline file:** each audited path has a baseline committed to the repo at `.a11y/<path-relative-to-repo-root>.json` (e.g. auditing `app/src/main/.../LoginScreen.kt` reads/writes `.a11y/app/src/main/.../LoginScreen.kt.json`).
+
+- **No baseline exists** → first audit. Report every finding as `🆕 Nouveau`, then write the baseline listing them as open.
+- **A baseline exists** → re-audit. For each baseline entry, re-inspect the code area it describes and judge whether the underlying issue still exists (by description/location, not by line number — code shifts):
+  - No longer present → `✅ Corrigé`
+  - Still present → `⚠️ Toujours ouvert`
+
+  Then scan the whole file fresh for anything not already in the baseline → `🆕 Nouveau` (covers regressions and newly-introduced issues). Rewrite the baseline afterward keeping only entries still open (`⚠️`/`🆕`) — drop `✅ Corrigé` entries.
+
+Baseline entry schema (JSON array, one object per open finding):
+
+```json
+{
+  "theme": 9,
+  "level": "A",
+  "file": "app/src/main/java/.../LoginScreen.kt",
+  "description": "Placeholder used as the only label on the email field",
+  "first_seen": "2026-09-11"
+}
+```
+
+**Report format:** always render findings as a table, never a bulleted list:
+
+| # | Thème (réf.) | Niveau | Emplacement | Statut | Constat |
+|---|---|---|---|---|---|
+| 1 | §9 Formulaires | [A] | LoginScreen.kt:42 | ✅ Corrigé | Placeholder servait de seul label |
+| 2 | §5 Composants | [AA] | LoginScreen.kt:58 | ⚠️ Toujours ouvert | Bouton icône sans contentDescription |
+| 3 | §2 Contraste | [A] | LoginScreen.kt:71 | 🆕 Nouveau | Erreur affichée en rouge seul |
+
+End with a one-line summary: `X corrigés · Y toujours ouverts · Z nouveaux`.
 
 ---
 
