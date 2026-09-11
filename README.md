@@ -55,13 +55,18 @@ mobile-ally-framework/
 │   │   └── src/test/java/com/fram/lint/
 │   │       └── A11yLintChecksTest.kt
 │   ├── ci/
-│   │   ├── a11y-lint-ios.yml       ← GitHub Actions iOS
-│   │   ├── a11y-lint-android.yml   ← GitHub Actions Android
-│   │   └── a11y-report.sh          ← Script rapport de conformité JSON + HTML
+│   │   ├── a11y-lint-ios.yml       ← GitHub Actions iOS (à copier chez le consommateur)
+│   │   ├── a11y-lint-android.yml   ← GitHub Actions Android (à copier chez le consommateur)
+│   │   ├── a11y-report.sh          ← Script rapport de conformité JSON + HTML
+│   │   ├── check-mermaid.py        ← Valide les diagrammes Mermaid des docs (rendu réel navigateur)
+│   │   ├── android-content-check/  ← Harness interne : compile patterns.kt + android-tests.kt en place
+│   │   └── ios-content-check/      ← Harness interne : compile ios-tests.swift dans un vrai target XCUITest
 │   └── README.md
 │
 ├── audit/
 │   └── grille-audit.html           ← Grille d'audit interactive (70+ critères, scoring live)
+│
+├── .github/workflows/               ← CI interne au repo FRAM (voir « Développement & CI » ci-dessous)
 │
 └── README.md                       ← Ce fichier
 ```
@@ -162,6 +167,26 @@ Ouvrir `audit/grille-audit.html` dans un navigateur. Cocher les critères, obten
 - **Tags** : `[A]` audit simplifié, `[AA]` audit complet
 - **Plateformes** : SwiftUI (iOS 16+) et Jetpack Compose (Material3)
 - **Cross-platform** (Flutter, React Native, KMP) : 🔜 Évolution v2
+
+---
+
+## Développement & CI
+
+Le repo FRAM suit un workflow **gitflow** : `main` (production, déployé sur GitHub Pages) ← `develop` (intégration) ← `feature/*`. `main` est protégé — PR obligatoire (même pour les admins), pas de force-push, pas de suppression de branche.
+
+Cinq workflows GitHub Actions valident chaque changement avant merge :
+
+| Workflow | Déclencheur (chemins) | Ce qu'il vérifie |
+|---|---|---|
+| `ios-skills.yml` | `skills/**/ios-swiftui/**`, `skills/**/tests/ios-tests.swift`, `.swiftlint.yml` | SwiftLint (17 règles `a11y_*` doivent toutes se déclencher au moins une fois sur le corpus) + `swiftc -typecheck` de chaque `patterns.swift` + compilation réelle de chaque `ios-tests.swift` dans un vrai target XCUITest (`linting/ci/ios-content-check`) |
+| `android-skills.yml` | `skills/**/android-compose/**`, `skills/**/tests/android-tests.kt` | Compilation réelle de `patterns.kt` + `android-tests.kt` (`linting/ci/android-content-check`) |
+| `compose-lint.yml` | `linting/compose-lint/**` | Tests des 7 détecteurs Android Lint (17 tests unitaires) |
+| `docs.yml` | `docs/**`, `mkdocs.yml` | `mkdocs build --strict` + validation de chaque diagramme Mermaid dans un vrai moteur mermaid.js (Chromium headless) |
+| `pages.yml` | `docs/**`, `mkdocs.yml` (push sur `main`) | Build + déploiement GitHub Pages |
+
+Les workflows sont **path-filtrés** : une PR qui ne touche aucun des chemins ci-dessus ne déclenche aucun check. C'est pourquoi la protection de branche sur `main` n'exige pas de check spécifique — vérifier manuellement que les checks pertinents à la PR sont verts avant de merger.
+
+Les harnesses `linting/ci/*-content-check/` ne font pas partie du framework distribué (les consommateurs n'en ont pas besoin) : ils compilent les vrais fichiers `skills/*/...` en place — sans copie — pour garantir qu'aucun exemple de pattern ou de test ne casse silencieusement.
 
 ---
 
