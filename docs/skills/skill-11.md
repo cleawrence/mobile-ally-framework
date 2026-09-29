@@ -118,6 +118,11 @@ Ces règles impactent directement la motricité fine (cibler un bouton) et le st
 !!! example "Règle"
     Si un utilisateur se trompe dans un champ email, n'effacez pas tous les autres champs du formulaire au moment de l'affichage de l'erreur ! Conservez sa saisie.
 
+### 5. Mouvements de glissement `[2.2 · AA]`
+
+!!! info "Hors RAAM 1.1, hors scoring"
+    **2.5.7** : toute action par glissement (réordonner, déplacer) doit avoir une alternative à un seul appui : `accessibilityAction(named:)` + `contextMenu` (iOS), boutons visibles + `customActions` (Compose). Détails : [Extensions WCAG 2.2](../extensions-wcag22.md).
+
 ## Checklist [A] / [AA]
 
 - [ ] Boutons tactiles font au moins 44x44 pt (iOS) ou 48x48 dp (Android).

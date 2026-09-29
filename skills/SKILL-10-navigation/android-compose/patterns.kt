@@ -1,6 +1,9 @@
 package com.fram.a11y.skill10
 
 import androidx.compose.foundation.focusable
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -159,6 +162,65 @@ fun FocusReturnPattern() {
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - 6. FOCUS NON MASQUÉ [2.2 · AA] — WCAG 2.4.11 (extension, hors RAAM 1.1)
+// L'élément qui a le focus (TalkBack, clavier, Switch Access) ne doit pas être entièrement caché
+// par une barre fixe ou par le clavier à l'écran.
+
+// ✅ Bon: Scaffold réserve la place de la barre du bas (paddingValues) et imePadding() fait remonter
+// le contenu au-dessus du clavier.
+@Composable
+fun FocusNotObscuredPattern() {
+    Scaffold(
+        bottomBar = {
+            BottomAppBar {
+                Button(onClick = { /* action */ }, modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text("Enregistrer")
+                }
+            }
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .padding(16.dp)
+        ) {
+            repeat(12) { index ->
+                var value by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    label = { Text("Champ ${index + 1}") }
+                )
+            }
+        }
+    }
+}
+
+// ❌ Mauvais: barre superposée sans réserver d'espace ni gérer le clavier : VIOLATION [2.2 · AA] 2.4.11
+@Composable
+fun FocusObscuredByStickyBarPattern() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp)) {
+            repeat(12) { index ->
+                var value by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { value = it },
+                    label = { Text("Champ ${index + 1}") }
+                )
+            }
+        }
+        Button(
+            onClick = { /* action */ },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Text("Enregistrer")
         }
     }
 }

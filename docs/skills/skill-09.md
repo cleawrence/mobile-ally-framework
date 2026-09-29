@@ -174,6 +174,11 @@ Les formulaires constituent le point de blocage **le plus fréquent** pour les u
     )
     ```
 
+### 6. Extensions WCAG 2.2 `[2.2]`
+
+!!! info "Hors RAAM 1.1, hors scoring"
+    **3.3.8 Authentification accessible** (`[2.2 · AA]`) : `textContentType(.username / .password)` (iOS) ou `contentType` (Compose) pour le gestionnaire de mots de passe, ne jamais bloquer le collage, proposer la biométrie. **3.3.7 Saisie redondante** (`[2.2 · A]`) : réutiliser une information déjà saisie (« Identique à l'adresse de facturation »). Détails et exemples : [Extensions WCAG 2.2](../extensions-wcag22.md).
+
 ## Checklist [A] / [AA]
 
 - [ ] Chaque champ a un label **visible et persistant**.

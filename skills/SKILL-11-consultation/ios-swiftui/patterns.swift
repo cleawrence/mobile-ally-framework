@@ -141,3 +141,58 @@ struct InputRetentionPattern: View {
         }
     }
 }
+
+// MARK: - 5. MOUVEMENTS DE GLISSEMENT [2.2 · AA] — WCAG 2.5.7 (extension, hors RAAM 1.1)
+
+/// Toute action qui se fait en faisant glisser (réordonner, déplacer) doit pouvoir se faire
+/// avec un simple appui, sans glisser : Switch Control, Voice Control et de nombreux utilisateurs
+/// à mobilité réduite ne peuvent pas maintenir un glissement.
+struct DraggingAlternativePattern: View {
+    @State private var meals = ["Petit-déjeuner", "Déjeuner", "Dîner"]
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(meals, id: \.self) { meal in
+                    Text(meal)
+                        // ✅ Bon — alternatives sans glissement pour VoiceOver / Switch Control / Voice Control
+                        .accessibilityAction(named: "Monter") { move(meal, by: -1) }
+                        .accessibilityAction(named: "Descendre") { move(meal, by: 1) }
+                        .accessibilityHint("Menu d'actions : monter ou descendre")
+                        // ✅ Bon — alternative visible à un seul appui (appui long, sans glisser)
+                        .contextMenu {
+                            Button("Monter") { move(meal, by: -1) }
+                                .accessibilityLabel("Monter \(meal)")
+                            Button("Descendre") { move(meal, by: 1) }
+                                .accessibilityLabel("Descendre \(meal)")
+                        }
+                }
+                // Glisser reste disponible, mais n'est plus le seul moyen
+                .onMove { meals.move(fromOffsets: $0, toOffset: $1) }
+            }
+            .navigationTitle("Menu de la journée")
+        }
+    }
+
+    private func move(_ meal: String, by offset: Int) {
+        guard let index = meals.firstIndex(of: meal) else { return }
+        let target = index + offset
+        guard meals.indices.contains(target) else { return }
+        meals.swapAt(index, target)
+    }
+}
+
+/// ❌ Mauvais — réordonnement possible uniquement par glissement : VIOLATION [2.2 · AA] 2.5.7
+struct DragOnlyReorderPattern: View {
+    @State private var meals = ["Petit-déjeuner", "Déjeuner", "Dîner"]
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(meals, id: \.self) { meal in Text(meal) }
+                    .onMove { meals.move(fromOffsets: $0, toOffset: $1) }
+            }
+            .navigationTitle("Menu de la journée")
+        }
+    }
+}

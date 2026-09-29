@@ -264,3 +264,66 @@ struct FocusOnErrorPattern: View {
         .padding()
     }
 }
+
+// MARK: - 9. FOCUS NON MASQUÉ [2.2 · AA] — WCAG 2.4.11 (extension, hors RAAM 1.1)
+
+/// L'élément qui a le focus (VoiceOver, clavier matériel, Switch Control) ne doit pas être entièrement
+/// caché par une barre fixe. Une barre posée en overlay ne réduit pas la zone de défilement :
+/// le dernier champ reste sous elle. `safeAreaInset` réserve la place.
+struct FocusNotObscuredPattern: View {
+    @State private var values = Array(repeating: "", count: 12)
+    @FocusState private var focusedIndex: Int?
+
+    var body: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(values.indices, id: \.self) { index in
+                        Text("Champ \(index + 1)")
+                        TextField("", text: $values[index])
+                            .accessibilityLabel("Champ \(index + 1)")
+                            .focused($focusedIndex, equals: index)
+                            .id(index)
+                    }
+                }
+                .padding()
+            }
+            // ✅ Bon — la barre fixe réserve son espace : le contenu défile au-dessus d'elle
+            .safeAreaInset(edge: .bottom) {
+                Button("Enregistrer le formulaire") { /* action */ }
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(.bar)
+            }
+            // ✅ Bon — amener le champ actif dans la zone visible (sans animation : Reduce Motion)
+            .onChange(of: focusedIndex) { _, newValue in
+                if let newValue {
+                    proxy.scrollTo(newValue, anchor: .center)
+                }
+            }
+        }
+    }
+}
+
+/// ❌ Mauvais — barre en overlay sans réserver d'espace : le dernier champ reste caché dessous
+/// VIOLATION [2.2 · AA] 2.4.11
+struct FocusObscuredByStickyBarPattern: View {
+    @State private var values = Array(repeating: "", count: 12)
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(values.indices, id: \.self) { index in
+                        Text("Champ \(index + 1)")
+                        TextField("", text: $values[index])
+                            .accessibilityLabel("Champ \(index + 1)")
+                    }
+                }
+                .padding()
+            }
+            Button("Envoyer") { /* action */ }
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .background(.bar)
+        }
+    }
+}

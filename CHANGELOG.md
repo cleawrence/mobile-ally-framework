@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+### Ajouté
+
+- **Extensions WCAG 2.2**, marquées `[2.2]` et hors du scoring RAAM [A] / [AA] : 3.3.8 Authentification accessible (SKILL-09), 3.3.7 Saisie redondante (SKILL-09), 2.4.11 Focus non masqué (SKILL-10), 2.5.7 Mouvements de glissement (SKILL-11). Patterns SwiftUI et Compose (✅ et ❌) compilés par les harnesses de la CI, page dédiée du site *Extensions WCAG 2.2*, renvois dans les `SKILL.md` et le skill condensé `mobile-a11y`.
+- README : précision du périmètre (RAAM 1.1 = base WCAG 2.1, WCAG 2.2 en extension).
+
 ## [1.1.0] — 2026-09-29
 
 ### Ajouté

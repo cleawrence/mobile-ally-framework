@@ -60,6 +60,12 @@ Le focus doit retourner à l'élément **déclencheur** quand la modale se ferme
 
 ---
 
+## Extension WCAG 2.2 `[2.2]` — Focus non masqué (2.4.11, `[AA]`, hors RAAM 1.1)
+
+Une barre fixe ne doit pas cacher **entièrement** l'élément qui a le focus. iOS : `.safeAreaInset(edge: .bottom)` plutôt qu'un overlay. Android : `Scaffold` + `paddingValues` et `imePadding()`. Voir `patterns.swift` §9 et `patterns.kt` §6.
+
+---
+
 ## Position dans l'application
 
 VoiceOver/TalkBack doivent toujours pouvoir répondre à "Où suis-je ?" :
