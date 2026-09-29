@@ -253,6 +253,34 @@ tags:
     }
     ```
 
+### 8. Cartes `[A]`
+
+Une carte est un graphique complexe : il faut un résumé, des repères nommés, une alternative textuelle (liste) et un vrai bouton pour toute action déclenchée par un tap sur la carte.
+
+=== "SwiftUI"
+    ```swift title="✅ Bon"
+    Button { showFullScreen = true } label: {
+        Map { ForEach(places) { Marker($0.name, coordinate: $0.coordinate) } }
+            .frame(minHeight: 240)
+            .allowsHitTesting(false)
+    }
+    .buttonStyle(.plain)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel("Carte : \(places.count) lieux à proximité")
+    .accessibilityHint("Ouvre la carte en plein écran")
+    // + alternative en liste (List) dans la vue plein écran
+    ```
+
+    ```swift title="❌ Mauvais"
+    Map { … }
+        .disabled(true)
+        .overlay(Color.secondary.opacity(0.001))
+        .onTapGesture { showFullScreen.toggle() } // aucun rôle, aucun libellé
+    ```
+
+=== "Jetpack Compose"
+    Voir les patterns iOS ; côté Compose, exposer la carte avec `Modifier.clickable(onClickLabel = …)` + `contentDescription` de synthèse, et proposer la même information en liste.
+
 ## Checklist Audit Simplifié `[A]`
 
 - [ ] Les icônes purement décoratives sont masquées (`accessibilityHidden(true)` / `contentDescription = null`)

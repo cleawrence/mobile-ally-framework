@@ -127,6 +127,36 @@ La navigation concerne l'ordre et le cheminement. L'ordre de focus de haut en ba
     }
     ```
 
+### 5. Focus VoiceOver : `@AccessibilityFocusState` `[A]`
+
+!!! warning "`@FocusState` ≠ focus VoiceOver"
+    `@FocusState` gère le focus **clavier**. Il ne déplace pas le curseur VoiceOver : utiliser `@AccessibilityFocusState` avec `.accessibilityFocused(_:)`.
+
+=== "SwiftUI"
+    ```swift title="✅ Bon — retour du focus sur le déclencheur à la fermeture d'une sheet"
+    @AccessibilityFocusState private var triggerFocused: Bool
+
+    Button("Filtrer les résultats") { showFilters = true }
+        .accessibilityFocused($triggerFocused)
+        .sheet(
+            isPresented: $showFilters,
+            onDismiss: { triggerFocused = true }, // sinon VoiceOver retombe en haut de l'écran
+            content: { FiltersView().accessibilityAddTraits(.isModal) }
+        )
+    ```
+
+    ```swift title="✅ Bon — focus sur le champ en erreur après validation"
+    @AccessibilityFocusState private var focusedField: Field?
+
+    TextField("exemple@domaine.fr", text: $email)
+        .accessibilityLabel("Adresse email")
+        .accessibilityFocused($focusedField, equals: .email)
+    // après échec de validation : focusedField = .email
+    ```
+
+=== "Jetpack Compose"
+    Ce pattern est spécifique à iOS. Pour les dialogs Compose, voir le pattern 3 (`AlertDialog`).
+
 ## Checklist [A] / [AA]
 
 - [ ] L'ordre de focus (lecture) correspond à la structure visuelle.

@@ -112,6 +112,25 @@ tags:
     1. Titre unique et pertinent, annoncé par TalkBack.
     2. Titre générique, ne décrit pas le contexte.
 
+### 4. Titre de panneau (`paneTitle`) `[A]`
+
+Sur tablette ou écran à panneaux (liste + détail), un seul `TopAppBar` ne suffit pas : TalkBack ne sait pas qu'un panneau vient d'apparaître.
+
+=== "Jetpack Compose"
+    ```kotlin title="✅ Bon"
+    Column(
+        modifier = Modifier.semantics { paneTitle = "Détail du message" } // annoncé à l'apparition
+    ) { Text(message) }
+    ```
+
+    ```kotlin title="❌ Mauvais"
+    // Panneau de détail qui apparaît sans titre : TalkBack ne dit rien
+    Column { Text(message) }
+    ```
+
+=== "SwiftUI"
+    Sur iOS, le titre de navigation (`.navigationTitle`) et `UIAccessibility.post(notification: .screenChanged, …)` jouent ce rôle.
+
 ## Checklist [A]
 - [ ] La langue par défaut de l'application est configurée dans le projet (`Info.plist` ou ressource).
 - [ ] Tous les passages en langue étrangère utilisent un attribut de langue programmatiquement (`.accessibilityLanguage` ou `localeList`).

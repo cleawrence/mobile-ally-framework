@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import MapKit
 
 // =============================================================================
 // SKILL-01 — Éléments Graphiques — Patterns SwiftUI
@@ -489,5 +490,84 @@ struct IconButtonPatterns: View {
             .accessibilityLabel("Supprimer l'article")
         }
         .padding()
+    }
+}
+
+// MARK: - 8. CARTES [A] — Combinaison critères 1.1, 1.2, 1.6, 5.1, 5.3
+
+/// Une carte est un graphique complexe : VoiceOver ne peut pas en « lire » le contenu visuel.
+/// Il faut (1) un résumé, (2) des repères nommés, (3) une alternative textuelle (liste),
+/// et (4) un vrai bouton pour toute action déclenchée par un tap sur la carte.
+struct MapPlace: Identifiable {
+    let id = UUID()
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+}
+
+struct AccessibleMapPreviewPattern: View {
+    let places: [MapPlace]
+    @State private var showFullScreen = false
+
+    var body: some View {
+        // ✅ Bon — la carte est un Button : rôle, libellé et action exposés à VoiceOver et Switch Control
+        Button {
+            showFullScreen = true
+        } label: {
+            Map {
+                ForEach(places) { place in
+                    // Marker expose son titre à VoiceOver
+                    Marker(place.name, coordinate: place.coordinate)
+                }
+            }
+            .frame(minHeight: 240)
+            .allowsHitTesting(false) // le tap est porté par le Button, pas par la carte
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Carte : \(places.count) lieux à proximité")
+        .accessibilityHint("Ouvre la carte en plein écran")
+        .sheet(isPresented: $showFullScreen) {
+            AccessibleMapListAlternative(places: places)
+                .accessibilityAddTraits(.isModal)
+        }
+    }
+}
+
+/// ✅ Bon — alternative textuelle : la même information sous forme de liste navigable
+struct AccessibleMapListAlternative: View {
+    let places: [MapPlace]
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List(places) { place in
+                Text(place.name)
+            }
+            .navigationTitle("Lieux à proximité")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Fermer") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+/// ❌ Mauvais — carte désactivée + calque quasi transparent + onTapGesture : VIOLATION [A] 5.1 / 5.3
+/// VoiceOver ne voit ni rôle ni libellé ; Switch Control et Voice Control ne peuvent pas ouvrir la carte.
+struct InaccessibleMapPreviewPattern: View {
+    let places: [MapPlace]
+    @State private var showFullScreen = false
+
+    var body: some View {
+        Map {
+            ForEach(places) { place in
+                Marker(place.name, coordinate: place.coordinate)
+            }
+        }
+        .frame(minHeight: 240)
+        .disabled(true)
+        .overlay(Color.secondary.opacity(0.001))
+        .onTapGesture { showFullScreen.toggle() }
     }
 }

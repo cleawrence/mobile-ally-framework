@@ -2,6 +2,7 @@ package com.fram.a11y.skill08
 
 import android.content.Context
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -18,10 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // MARK: - 1. REDUCE MOTION [A] — Critère 8.6
 
@@ -176,3 +180,55 @@ fun AccessibleAutoPlayCarousel() {
 // MARK: - 4. EXOPLAYER / MEDIA3 [A] & [AA]
 // (Note: La configuration détaillée de track selection avec ExoPlayer se fait côté logique Kotlin pure, 
 // mais on s'assure d'exposer les boutons pour la transcription et l'audiodescription dans l'UI).
+
+// MARK: - 5. MESSAGES TEMPORAIRES [A] 2.2.1 · [AA] 4.1.3 (WCAG) — Snackbar, Toast, AlertDialog
+// Un message qui disparaît seul est un contenu limité dans le temps : un utilisateur de TalkBack
+// (lecture linéaire) ou de Switch Access peut ne pas avoir fini de le lire, ni atteint son action.
+
+// ✅ Bon: Snackbar avec action « Annuler » et bouton de fermeture, sans disparition automatique.
+// TalkBack annonce le Snackbar à son apparition ; l'utilisateur garde le contrôle de sa fermeture.
+@Composable
+fun SnackbarWithUndoPattern(onUndo: () -> Unit) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
+        Button(
+            modifier = Modifier.padding(paddingValues),
+            onClick = {
+                scope.launch {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Article supprimé",
+                        actionLabel = "Annuler",
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Indefinite
+                    )
+                    if (result == SnackbarResult.ActionPerformed) onUndo()
+                }
+            }
+        ) {
+            Text("Supprimer l'article")
+        }
+    }
+}
+
+// ✅ Bon: message d'état dans la page (sans overlay) annoncé par une région live
+@Composable
+fun InlineStatusMessagePattern(status: String) {
+    Text(
+        text = status, // ex. « 3 résultats trouvés »
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+    )
+}
+
+// ❌ Mauvais: Toast pour une information importante
+// Disparaît après ~2 s, sans action ni fermeture possible : VIOLATION [A] 2.2.1.
+@Composable
+fun BadToastPattern() {
+    val context = LocalContext.current
+    Button(onClick = {
+        Toast.makeText(context, "Paiement refusé, veuillez réessayer", Toast.LENGTH_SHORT).show()
+    }) {
+        Text("Payer")
+    }
+}
