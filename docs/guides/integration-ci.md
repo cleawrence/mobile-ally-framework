@@ -38,6 +38,29 @@ cp mobile-ally-framework/linting/ci/a11y-lint-ios.yml .github/workflows/
     - Publie un résumé dans le **PR Summary**
     - Archive le rapport JSON en artifact (30 jours)
 
+### Complément optionnel : `a11y-check`
+
+[`a11y-check`](https://github.com/cvs-health/ios-swiftui-accessibility-techniques) (CVS Health, Apache 2.0) est un analyseur statique SwiftUI qui complète SwiftLint : 45 règles mappées sur WCAG 2.2, score de 0 à 100, sortie SARIF pour le code scanning GitHub.
+
+```bash
+# Installation (selon le README du projet)
+brew tap cvs-health/ios-swiftui-accessibility-techniques https://github.com/cvs-health/ios-swiftui-accessibility-techniques.git
+brew install --HEAD cvs-health/ios-swiftui-accessibility-techniques/a11y-check
+
+# Analyse (depuis la racine du projet)
+a11y-check . --no-trend --only error
+a11y-check . --no-trend --min-score 80      # code de sortie non nul sous le seuil
+a11y-check . --no-trend --format sarif > results.sarif
+```
+
+!!! warning "Toujours ajouter `--no-trend`"
+    Par défaut, l'outil écrit un fichier de suivi `.a11y-scores.json` dans les dossiers analysés. `--no-trend` évite d'ajouter des fichiers au projet.
+
+!!! note "Ce que l'outil ne remplace pas"
+    - Il ne couvre que **SwiftUI** (pas UIKit) et raisonne en **WCAG 2.2**, pas en RAAM 1.1 : les niveaux [A] / [AA] de FRAM ne s'y retrouvent pas tels quels.
+    - Analyse statique uniquement : les ratios de contraste, l'information portée par la couleur seule ou l'association d'un libellé à ses valeurs (tableaux) ne sont pas vérifiés.
+    - Des faux positifs sont possibles (par exemple des `Text` en `.subheadline` signalés comme titres) : relire les résultats avant de bloquer une PR.
+
 ---
 
 ## GitHub Actions — Android

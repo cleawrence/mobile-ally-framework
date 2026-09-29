@@ -256,6 +256,8 @@ Les harnesses `linting/ci/*-content-check/` ne font pas partie du framework dist
 - [EN 301 549 v3.2.1](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/en_301549v030201p.pdf)
 - [Apple — Accessibility for SwiftUI](https://developer.apple.com/documentation/swiftui/accessibility)
 - [Android — Accessibility in Compose](https://developer.android.com/develop/ui/compose/accessibility)
+- [CVS Health — iOS SwiftUI Accessibility Techniques](https://github.com/cvs-health/ios-swiftui-accessibility-techniques) — app de démo (bons/mauvais exemples, WCAG 2.2) et analyseur statique `a11y-check` (Apache 2.0)
+- [CVS Health — Android Compose Accessibility Techniques](https://github.com/cvs-health/android-compose-accessibility-techniques) — app de démo Jetpack Compose (Apache 2.0)
 
 ---
 
