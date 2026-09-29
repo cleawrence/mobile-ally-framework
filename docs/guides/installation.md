@@ -138,6 +138,9 @@ Le skill se déclenche automatiquement selon le contexte (dès que vous écrivez
 /mobile-a11y audit <path>   # audite un fichier contre les 12 thématiques, remonte les vraies violations
 ```
 
+!!! note "Baseline d'audit optionnelle"
+    L'audit est **en lecture seule par défaut**. Après le rapport, le skill demande confirmation avant d'écrire un suivi `.a11y/<chemin>.json` dans le projet audité. `--baseline` écrit sans demander, `--no-baseline` n'écrit jamais et ne demande pas.
+
 ### Mettre à jour
 
 ```bash

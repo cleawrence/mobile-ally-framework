@@ -163,6 +163,8 @@ npx skills update mobile-a11y
 /mobile-a11y <thème>                # va directement à une thématique (numéro, nom FR ou EN)
 /mobile-a11y audit <chemin>         # audite le(s) fichier(s) et rapporte les violations réelles
 /mobile-a11y audit                  # idem, sur les fichiers en cours de discussion
+/mobile-a11y audit <chemin> --baseline     # enregistre aussi la baseline .a11y/ sans demander
+/mobile-a11y audit <chemin> --no-baseline  # n'écrit jamais de baseline, ne demande pas
 ```
 
 | Vous voulez... | Commande |
@@ -175,7 +177,7 @@ Les 12 thématiques sont accessibles **une par une ou toutes ensemble** via ce s
 
 Alias de thèmes : `1` images/graphiques · `2` contraste/couleurs · `3` adaptation/dynamic-type · `4` tableaux/listes · `5` interactive/composants · `6` langue/titres · `7` structure/headings · `8` media/temporels · `9` forms/formulaires · `10` navigation/focus · `11` consultation/touch-targets · `12` documentation.
 
-> ⚠️ **Baseline d'audit** : `/mobile-a11y audit` écrit un fichier de suivi `.a11y/<chemin>.json` **dans le projet audité** (statuts `🆕 Nouveau` / `⚠️ Toujours ouvert` / `✅ Corrigé` aux audits suivants). Prévoyez de le versionner, ou de l'ajouter au `.gitignore` si vous ne le souhaitez pas.
+> **Baseline d'audit (optionnelle)** : `/mobile-a11y audit` est **en lecture seule par défaut**. Après le rapport, le skill vous **demande confirmation** avant d'écrire un fichier de suivi `.a11y/<chemin>.json` dans le projet audité (il permet d'afficher `🆕 Nouveau` / `⚠️ Toujours ouvert` / `✅ Corrigé` aux audits suivants). Si vous refusez, rien n'est écrit. Deux options pour ne pas être interrogé : `--baseline` (écrire sans demander) et `--no-baseline` (ne jamais écrire). Si vous enregistrez une baseline, versionnez-la ou ajoutez `.a11y/` au `.gitignore`.
 
 Détails et exemples : [guide d'installation](docs/guides/installation.md).
 
