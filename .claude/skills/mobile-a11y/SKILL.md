@@ -19,6 +19,8 @@ This skill also triggers automatically by context (see description above) — ex
 /mobile-a11y <theme>                # jump straight to one theme — name or number, French or English
 /mobile-a11y audit <path>           # read the file(s) at <path> and report real violations against all 12 themes
 /mobile-a11y audit                  # same, against the file(s) currently open/discussed in this conversation
+/mobile-a11y audit <path> --baseline     # also save the baseline in .a11y/ without asking
+/mobile-a11y audit <path> --no-baseline  # never write a baseline, never ask
 ```
 
 Theme aliases (number, English, French — any of these match): `1` images/graphics/`images`/`graphiques` · `2` contrast/`couleurs`/`contrastes` · `3` adaptation/`dynamic-type`/`presentation` · `4` tables/`tableaux`/`listes` · `5` interactive/`composants`/`interactifs` · `6` required/`langue`/`titres` · `7` structure/`structuration`/headings · `8` media/`multimedia`/`temporels` · `9` forms/`formulaires` · `10` navigation/`focus` · `11` `consultation`/touch-targets/gestures · `12` documentation.
@@ -29,14 +31,20 @@ Theme aliases (number, English, French — any of these match): `1` images/graph
 
 **`audit <path>` (or `audit` with no path):** read the given file(s) — or, with no path, the file(s) most recently discussed/edited in this conversation — and check them against every theme below. Report only concrete, real findings. If a theme doesn't apply to that file (e.g. no images in a pure logic file), skip it silently — don't pad the report with non-findings.
 
-**Baseline file:** each audited path has a baseline committed to the repo at `.a11y/<path-relative-to-repo-root>.json` (e.g. auditing `app/src/main/.../LoginScreen.kt` reads/writes `.a11y/app/src/main/.../LoginScreen.kt.json`).
+**Baseline file (optional, opt-in):** an audit is **read-only by default — never create, modify or delete a file in the audited project without the user's explicit confirmation.** Tracking progress over time uses an optional baseline at `.a11y/<path-relative-to-repo-root>.json` (e.g. auditing `app/src/main/.../LoginScreen.kt` uses `.a11y/app/src/main/.../LoginScreen.kt.json`).
 
-- **No baseline exists** → first audit. Report every finding as `🆕 Nouveau`, then write the baseline listing them as open.
+- **Reading is always allowed.** If a baseline already exists, use it for the comparison below.
+- **Writing needs confirmation.** After the report, ask once: *"Enregistrer ce résultat comme baseline dans `.a11y/` (N fichier(s)) pour suivre l'évolution aux prochains audits ?"* — listing the exact file path(s) that would be written. Write only on a clear yes. On no (or no answer), write nothing; the report alone is the deliverable. Never ask again for the same audit, and don't ask when the audit produced no findings and no baseline exists.
+- The user can pre-empt the question: `audit <path> --baseline` = write without asking again (still just those `.a11y/` files); `audit <path> --no-baseline` = don't write and don't ask.
+
+Comparison logic:
+
+- **No baseline exists** → first audit. Report every finding as `🆕 Nouveau`; if the user confirms, write the baseline listing them as open.
 - **A baseline exists** → re-audit. For each baseline entry, re-inspect the code area it describes and judge whether the underlying issue still exists (by description/location, not by line number — code shifts):
   - No longer present → `✅ Corrigé`
   - Still present → `⚠️ Toujours ouvert`
 
-  Then scan the whole file fresh for anything not already in the baseline → `🆕 Nouveau` (covers regressions and newly-introduced issues). Rewrite the baseline afterward keeping only entries still open (`⚠️`/`🆕`) — drop `✅ Corrigé` entries.
+  Then scan the whole file fresh for anything not already in the baseline → `🆕 Nouveau` (covers regressions and newly-introduced issues). If the user confirms, rewrite the baseline afterward keeping only entries still open (`⚠️`/`🆕`) — drop `✅ Corrigé` entries.
 
 Baseline entry schema (JSON array, one object per open finding):
 
