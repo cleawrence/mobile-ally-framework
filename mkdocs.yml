@@ -186,5 +186,6 @@ nav:
     - Rapport de conformité: audit/rapport-conformite.md
   - Référentiel:
     - RAAM 1.1 — Mapping: referentiel-raam.md
+    - Extensions WCAG 2.2: extensions-wcag22.md
     - Glossaire: glossaire.md
     - Tags: tags.md

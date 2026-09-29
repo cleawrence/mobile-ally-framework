@@ -5,13 +5,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -676,5 +679,70 @@ private fun submitLoginForm(
         password.isEmpty() -> onPasswordError("Le mot de passe est obligatoire")
         password.length < 8 -> onPasswordError("Le mot de passe doit contenir au moins 8 caractères")
         else -> onSuccess()
+    }
+}
+
+// MARK: - 10. AUTHENTIFICATION ACCESSIBLE [2.2 · AA] — WCAG 3.3.8 (extension, hors RAAM 1.1)
+// Ne pas exiger de test cognitif pour se connecter sans alternative : le gestionnaire de mots de
+// passe (remplissage automatique) et le collage doivent fonctionner. Ne jamais intercepter le collage.
+@Composable
+fun AccessibleAuthenticationPattern() {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        // ✅ Bon: contentType déclare la nature du champ au service de remplissage automatique
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Identifiant") },
+            singleLine = true,
+            modifier = Modifier.semantics { contentType = ContentType.Username }
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Mot de passe") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.semantics { contentType = ContentType.Password }
+        )
+        // Pour l'inscription : ContentType.NewPassword
+        // Alternative sans mémorisation : BiometricPrompt ou passkeys (Credential Manager)
+    }
+}
+
+// MARK: - 11. SAISIE REDONDANTE [2.2 · A] — WCAG 3.3.7 (extension, hors RAAM 1.1)
+// Ne pas redemander une information déjà saisie dans le même parcours : la réutiliser.
+@Composable
+fun RedundantEntryPattern() {
+    val billingAddress = "12 rue des Lilas, 75011 Paris"
+    var sameAsBilling by remember { mutableStateOf(true) }
+    var shippingAddress by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Adresse de facturation : $billingAddress")
+
+        // ✅ Bon: proposer de réutiliser l'adresse déjà saisie
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.toggleable(
+                value = sameAsBilling,
+                role = Role.Checkbox,
+                onValueChange = { sameAsBilling = it }
+            )
+        ) {
+            Checkbox(checked = sameAsBilling, onCheckedChange = null)
+            Text("Livraison identique à la facturation")
+        }
+
+        if (!sameAsBilling) {
+            OutlinedTextField(
+                value = shippingAddress,
+                onValueChange = { shippingAddress = it },
+                label = { Text("Adresse de livraison") }
+            )
+        }
     }
 }

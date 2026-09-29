@@ -6,6 +6,19 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [1.2.0] — 2026-09-29
+
+### Ajouté
+
+- **Extensions WCAG 2.2**, marquées `[2.2]` et hors du scoring RAAM [A] / [AA] (#35) : 3.3.8 Authentification accessible (SKILL-09), 3.3.7 Saisie redondante (SKILL-09), 2.4.11 Focus non masqué (SKILL-10), 2.5.7 Mouvements de glissement (SKILL-11). Patterns SwiftUI et Compose (✅ et ❌) compilés par les harnesses de la CI, page dédiée du site *Extensions WCAG 2.2*, renvois dans les `SKILL.md` et le skill condensé `mobile-a11y`.
+- README : précision du périmètre (RAAM 1.1 = base WCAG 2.1, WCAG 2.2 en extension).
+
+### Notes de mise à jour
+
+- Pour récupérer les nouveaux patterns dans le skill Claude Code déjà installé : `npx skills update mobile-a11y` (ou réinstaller avec `npx skills add https://github.com/cleawrence/mobile-ally-framework --skill mobile-a11y -g`).
+- Les critères `[2.2]` sont une **extension** : ils ne modifient ni le référentiel RAAM 1.1 ni le score [A] / [AA] existant.
+- Les exemples sont validés à la compilation, pas au lecteur d'écran ni avec un gestionnaire de mots de passe : à vérifier sur appareil.
+
 ## [1.1.0] — 2026-09-29
 
 ### Ajouté
@@ -61,6 +74,7 @@ Première release publiée. Elle regroupe tout l'historique du dépôt (PR #1 à
 - Les utilisateurs du skill déjà installé conservent l'ancien comportement de l'audit (écriture de la baseline sans confirmation) tant qu'ils n'ont pas lancé `npx skills update mobile-a11y`.
 - Les `skills/SKILL-XX-*/SKILL.md` sont de la documentation de référence, pas des skills installables : `npx skills add` affiche des avertissements « missing required frontmatter » à leur sujet, sans conséquence.
 
-[Non publié]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.1.0...develop
+[Non publié]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.2.0...develop
+[1.2.0]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cleawrence/mobile-ally-framework/releases/tag/v1.0.0

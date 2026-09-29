@@ -157,6 +157,11 @@ La navigation concerne l'ordre et le cheminement. L'ordre de focus de haut en ba
 === "Jetpack Compose"
     Ce pattern est spécifique à iOS. Pour les dialogs Compose, voir le pattern 3 (`AlertDialog`).
 
+### 6. Focus non masqué `[2.2 · AA]`
+
+!!! info "Hors RAAM 1.1, hors scoring"
+    **2.4.11** : une barre fixe ne doit pas cacher entièrement l'élément qui a le focus. iOS : `.safeAreaInset(edge: .bottom)` plutôt qu'un overlay ; Compose : `Scaffold` + `paddingValues` et `imePadding()`. Détails : [Extensions WCAG 2.2](../extensions-wcag22.md).
+
 ## Checklist [A] / [AA]
 
 - [ ] L'ordre de focus (lecture) correspond à la structure visuelle.

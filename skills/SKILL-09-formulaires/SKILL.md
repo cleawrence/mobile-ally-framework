@@ -99,6 +99,15 @@ Un message d'erreur accessible doit :
 
 ---
 
+## Extensions WCAG 2.2 `[2.2]` (hors RAAM 1.1, hors scoring)
+
+- **3.3.8 Authentification accessible** `[AA]` : pas de test cognitif sans alternative — `textContentType(.username/.password)` (iOS), `contentType` (Compose), collage jamais bloqué, biométrie proposée.
+- **3.3.7 Saisie redondante** `[A]` : ne pas redemander une information déjà saisie dans le parcours.
+
+Voir `patterns.swift` / `patterns.kt` (sections `[2.2 · …]`) et la page *Extensions WCAG 2.2* du site.
+
+---
+
 ## Vérification manuelle
 
 ### Protocole VoiceOver (iOS)
