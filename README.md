@@ -77,6 +77,12 @@ mobile-ally-framework/
 
 ---
 
+## Périmètre : RAAM 1.1 et extensions WCAG 2.2
+
+FRAM implémente le **RAAM 1.1** (base officielle : WCAG 2.1 et EN 301 549 v3.2.1). Quatre critères de **WCAG 2.2** utiles au mobile (3.3.8, 3.3.7, 2.4.11, 2.5.7) sont proposés en **extension**, marqués `[2.2]` et **hors du scoring** [A] / [AA] : voir la page [Extensions WCAG 2.2](https://cleawrence.github.io/mobile-ally-framework/extensions-wcag22/).
+
+---
+
 ## Niveaux de conformité
 
 | Niveau | Usage | Critères |

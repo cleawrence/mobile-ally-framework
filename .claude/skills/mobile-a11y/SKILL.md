@@ -451,6 +451,17 @@ Modifier.semantics {
 
 ---
 
+## WCAG 2.2 extensions `[2.2]` — beyond RAAM 1.1, not part of the [A]/[AA] score
+
+RAAM 1.1 is based on WCAG 2.1. These four WCAG 2.2 criteria are the most useful on mobile; flag them as `[2.2]`, never as RAAM findings.
+
+- **3.3.8 Accessible authentication `[AA]`** — no cognitive test to log in without an alternative: `.textContentType(.username / .password)` (iOS) / `contentType = ContentType.Password` (Compose), never block paste, offer biometrics.
+- **3.3.7 Redundant entry `[A]`** — don't re-ask info already entered in the flow ("same as billing address").
+- **2.4.11 Focus not obscured `[AA]`** — a sticky bar must not hide the focused element: `.safeAreaInset(edge: .bottom)` (iOS) / `Scaffold` padding + `imePadding()` (Compose), not an overlay.
+- **2.5.7 Dragging movements `[AA]`** — any drag action needs a single-tap alternative: `.accessibilityAction(named:)` + visible controls (iOS) / `customActions` + buttons (Compose).
+
+---
+
 ## When you need more than this
 
 This skill is a condensed cheat sheet. For exhaustive ✅/❌ pattern files (SwiftUI + Compose, one file per theme), full criteria tables, and working SwiftLint/Android-Lint rules that catch these mistakes automatically, see the FRAM repo: https://github.com/cleawrence/mobile-ally-framework — `skills/SKILL-01..12-*/` for patterns, `linting/` for the lint rules. If you're working inside a checkout of that repo, prefer reading the actual `skills/SKILL-XX-*/SKILL.md` and `patterns.swift`/`patterns.kt` files directly — they're the living source of truth this skill was distilled from, and may have grown since.

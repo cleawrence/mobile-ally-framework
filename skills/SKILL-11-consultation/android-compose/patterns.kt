@@ -3,6 +3,7 @@ package com.fram.a11y.skill11
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.*
@@ -174,3 +175,42 @@ fun InputRetentionPattern() {
         }
     }
 }
+
+// MARK: - 5. MOUVEMENTS DE GLISSEMENT [2.2 · AA] — WCAG 2.5.7 (extension, hors RAAM 1.1)
+// Toute action réalisée en glissant (réordonner, déplacer) doit pouvoir se faire d'un simple appui.
+
+// ✅ Bon: boutons « Monter / Descendre » visibles (un seul appui) + actions personnalisées TalkBack
+// (le glisser-déposer éventuel reste disponible, mais n'est plus le seul moyen).
+@Composable
+fun DraggingAlternativePattern() {
+    val meals = remember { mutableStateListOf("Petit-déjeuner", "Déjeuner", "Dîner") }
+
+    fun move(index: Int, offset: Int): Boolean {
+        val target = index + offset
+        if (target !in meals.indices) return false
+        val item = meals.removeAt(index)
+        meals.add(target, item)
+        return true
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        meals.forEachIndexed { index, meal ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.semantics {
+                    customActions = listOf(
+                        CustomAccessibilityAction("Monter") { move(index, -1) },
+                        CustomAccessibilityAction("Descendre") { move(index, 1) }
+                    )
+                }
+            ) {
+                Text(meal, modifier = Modifier.weight(1f))
+                TextButton(onClick = { move(index, -1) }, enabled = index > 0) { Text("Monter") }
+                TextButton(onClick = { move(index, 1) }, enabled = index < meals.lastIndex) { Text("Descendre") }
+            }
+        }
+    }
+}
+
+// ❌ Mauvais: réordonnement possible uniquement par glisser-déposer, sans bouton ni action
+// personnalisée : VIOLATION [2.2 · AA] 2.5.7

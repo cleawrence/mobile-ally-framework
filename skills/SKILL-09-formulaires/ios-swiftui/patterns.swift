@@ -1,4 +1,5 @@
 import SwiftUI
+import LocalAuthentication
 
 // =============================================================================
 // SKILL-09 — Formulaires — Patterns SwiftUI
@@ -706,6 +707,100 @@ struct AccessibleLoginForm: View {
         } else {
             isSubmitting = true
             // Appel réseau...
+        }
+    }
+}
+
+// MARK: - 10. AUTHENTIFICATION ACCESSIBLE [2.2 · AA] — WCAG 3.3.8 (extension, hors RAAM 1.1)
+
+/// Ne pas exiger de test cognitif (mémoriser, retranscrire) pour se connecter sans alternative :
+/// le gestionnaire de mots de passe, le collage et la biométrie doivent fonctionner.
+struct AccessibleAuthenticationPattern: View {
+    @State private var username = ""
+    @State private var password = ""
+    @State private var authError: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Identifiant")
+            // ✅ Bon — types de contenu explicites : le gestionnaire de mots de passe peut remplir
+            TextField("ex. prenom@domaine.fr", text: $username)
+                .accessibilityLabel("Identifiant")
+                .textContentType(.username)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+
+            Text("Mot de passe")
+            // ✅ Bon — .password (connexion) ; utiliser .newPassword à l'inscription
+            SecureField("", text: $password)
+                .accessibilityLabel("Mot de passe")
+                .textContentType(.password)
+
+            Button("Se connecter") { /* connexion */ }
+
+            // ✅ Bon — alternative sans mémorisation : Face ID / Touch ID
+            Button("Se connecter avec Face ID") {
+                authenticateWithBiometrics()
+            }
+
+            if let authError {
+                Text(authError).foregroundColor(.red)
+            }
+        }
+        .padding()
+    }
+
+    private func authenticateWithBiometrics() {
+        let context = LAContext()
+        var error: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            authError = "Authentification biométrique indisponible"
+            return
+        }
+        context.evaluatePolicy(
+            .deviceOwnerAuthenticationWithBiometrics,
+            localizedReason: "Vous connecter à votre compte"
+        ) { success, _ in
+            DispatchQueue.main.async {
+                authError = success ? nil : "Authentification échouée. Utilisez votre mot de passe."
+            }
+        }
+    }
+}
+
+/// ❌ Mauvais — collage bloqué dans le champ mot de passe : oblige à retaper (mémoriser) : VIOLATION [2.2 · AA] 3.3.8
+final class NoPasteTextField: UITextField {
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(UIResponderStandardEditActions.paste(_:)) { return false }
+        return super.canPerformAction(action, withSender: sender)
+    }
+}
+
+// MARK: - 11. SAISIE REDONDANTE [2.2 · A] — WCAG 3.3.7 (extension, hors RAAM 1.1)
+
+/// Ne pas redemander dans un même parcours une information déjà saisie :
+/// la préremplir, ou proposer de la réutiliser.
+struct RedundantEntryPattern: View {
+    @State private var billingAddress = "12 rue des Lilas, 75011 Paris"
+    @State private var sameAsBilling = true
+    @State private var shippingAddress = ""
+
+    var body: some View {
+        Form {
+            Section("Adresse de facturation") {
+                Text(billingAddress)
+            }
+            Section("Adresse de livraison") {
+                // ✅ Bon — réutiliser l'information déjà saisie au lieu de la redemander
+                Toggle("Identique à l'adresse de facturation", isOn: $sameAsBilling)
+
+                if !sameAsBilling {
+                    Text("Adresse de livraison")
+                    TextField("", text: $shippingAddress)
+                        .accessibilityLabel("Adresse de livraison")
+                        .textContentType(.fullStreetAddress)
+                }
+            }
         }
     }
 }

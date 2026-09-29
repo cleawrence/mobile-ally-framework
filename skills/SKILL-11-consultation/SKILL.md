@@ -30,6 +30,12 @@ Pour les formulaires qui requièrent un engagement financier, légal, ou des mod
 
 ---
 
+## Extension WCAG 2.2 `[2.2]` — Mouvements de glissement (2.5.7, `[AA]`, hors RAAM 1.1)
+
+Toute action faite en glissant (réordonner, déplacer) doit avoir une alternative à un seul appui : `accessibilityAction(named:)` + `contextMenu` (iOS), boutons visibles + `customActions` (Compose). Voir les patterns `[2.2 · AA]`.
+
+---
+
 ## Checklist de Consultation
 
 ### Niveau [A] - Simplifié
