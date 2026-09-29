@@ -4,6 +4,13 @@ Toutes les évolutions notables de FRAM sont consignées ici.
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet adopte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+### Ajouté
+
+- Références vers les projets CVS Health *iOS SwiftUI Accessibility Techniques* et *Android Compose Accessibility Techniques* (README et documentation).
+- Guide CI iOS : section optionnelle sur `a11y-check`, analyseur statique SwiftUI complémentaire à SwiftLint (avec `--no-trend`, et ses limites par rapport à FRAM).
+
 ## [1.0.0] — 2026-09-29
 
 Première release publiée. Elle regroupe tout l'historique du dépôt (PR #1 à #28).
@@ -41,4 +48,5 @@ Première release publiée. Elle regroupe tout l'historique du dépôt (PR #1 à
 - Les utilisateurs du skill déjà installé conservent l'ancien comportement de l'audit (écriture de la baseline sans confirmation) tant qu'ils n'ont pas lancé `npx skills update mobile-a11y`.
 - Les `skills/SKILL-XX-*/SKILL.md` sont de la documentation de référence, pas des skills installables : `npx skills add` affiche des avertissements « missing required frontmatter » à leur sujet, sans conséquence.
 
+[Non publié]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.0.0...develop
 [1.0.0]: https://github.com/cleawrence/mobile-ally-framework/releases/tag/v1.0.0
