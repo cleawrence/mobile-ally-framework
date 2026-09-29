@@ -194,3 +194,73 @@ struct FocusReturnPattern: View {
         }
     }
 }
+
+// MARK: - 8. FOCUS VOICEOVER : @AccessibilityFocusState [A] — Critères 10.2, 10.6
+
+/// ⚠️ `@FocusState` gère le focus **clavier** (champs de saisie, clavier matériel).
+/// Il ne déplace PAS le curseur VoiceOver. Pour VoiceOver, utiliser `@AccessibilityFocusState`
+/// avec `.accessibilityFocused(_:)`.
+
+/// Pattern: Retour du focus VoiceOver sur le déclencheur à la fermeture d'une sheet
+struct SheetFocusReturnPattern: View {
+    @State private var showFilters = false
+    @AccessibilityFocusState private var triggerFocused: Bool
+
+    var body: some View {
+        Button("Filtrer les résultats") {
+            showFilters = true
+        }
+        .accessibilityFocused($triggerFocused)
+        .sheet(
+            isPresented: $showFilters,
+            onDismiss: {
+                // ✅ Sans cette ligne, VoiceOver retombe en haut de l'écran après la fermeture
+                triggerFocused = true
+            },
+            content: {
+                VStack {
+                    Text("Filtres")
+                        .accessibilityAddTraits(.isHeader)
+                    Button("Fermer les filtres") { showFilters = false }
+                }
+                .padding()
+                .accessibilityAddTraits(.isModal)
+            }
+        )
+    }
+}
+
+/// Pattern: Amener le focus VoiceOver sur le premier champ en erreur après validation
+struct FocusOnErrorPattern: View {
+    enum Field: Hashable { case email }
+
+    @State private var email = ""
+    @State private var emailError: String?
+    @AccessibilityFocusState private var focusedField: Field?
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Adresse email")
+            TextField("exemple@domaine.fr", text: $email)
+                .textContentType(.emailAddress)
+                .accessibilityLabel("Adresse email")
+                .accessibilityFocused($focusedField, equals: .email)
+
+            if let emailError {
+                Text(emailError)
+                    .foregroundColor(.red)
+            }
+
+            Button("Valider") {
+                if !email.contains("@") {
+                    emailError = "Format d'email invalide"
+                    // ✅ VoiceOver lit directement le champ en erreur (et son message associé)
+                    focusedField = .email
+                } else {
+                    emailError = nil
+                }
+            }
+        }
+        .padding()
+    }
+}

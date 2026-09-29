@@ -132,6 +132,31 @@ tags:
     // l'activation automatique des sous-titres (CC) système.
     ```
 
+### 5. Messages temporaires (Snackbar, Toast) `[A]`
+
+Un message qui disparaît seul est un contenu limité dans le temps (WCAG 2.2.1 `[A]`) ; les messages d'état doivent aussi être annoncés (WCAG 4.1.3 `[AA]`).
+
+=== "Jetpack Compose"
+    ```kotlin title="✅ Bon — Snackbar avec action et fermeture, sans disparition automatique"
+    snackbarHostState.showSnackbar(
+        message = "Article supprimé",
+        actionLabel = "Annuler",
+        withDismissAction = true,
+        duration = SnackbarDuration.Indefinite
+    )
+    ```
+
+    ```kotlin title="✅ Bon — message d'état dans la page"
+    Text(status, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+    ```
+
+    ```kotlin title="❌ Mauvais — Toast pour une information importante"
+    Toast.makeText(context, "Paiement refusé, veuillez réessayer", Toast.LENGTH_SHORT).show()
+    ```
+
+=== "SwiftUI"
+    Pour un message d'état, annoncer avec `AccessibilityNotification.Announcement("…").post()` (iOS 17+) et laisser un bouton de fermeture pour tout message affiché en surimpression.
+
 ## Checklist [A]
 - [ ] Tout contenu audio seul a une transcription textuelle accessible.
 - [ ] Toutes les vidéos avec parole ont des sous-titres (Closed Captions préférés).

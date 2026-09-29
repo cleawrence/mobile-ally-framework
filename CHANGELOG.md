@@ -9,6 +9,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 ### Ajouté
 
 - Références vers les projets CVS Health *iOS SwiftUI Accessibility Techniques* et *Android Compose Accessibility Techniques* (README et documentation).
+- **Patterns prioritaires**, compilés par les harnesses de la CI (`swiftc -typecheck` iOS, `compileDebugKotlin` Android) :
+  - iOS SKILL-01 §8 — cartes (`Map`) : résumé, repères nommés, alternative en liste, bouton réel pour l'ouverture plein écran ;
+  - iOS SKILL-10 §8 — `@AccessibilityFocusState` : retour du focus VoiceOver après une sheet, focus sur le champ en erreur (`@FocusState` ne gère que le clavier) ;
+  - Android SKILL-06 §5 — `paneTitle` pour les écrans à panneaux ;
+  - Android SKILL-08 §5 — messages temporaires : Snackbar sans disparition automatique, `liveRegion`, et le contre-exemple `Toast`.
+  - `SKILL.md` et pages du site correspondants, et skill condensé `mobile-a11y` mis à jour.
 - Guide CI iOS : section optionnelle sur `a11y-check`, analyseur statique SwiftUI complémentaire à SwiftLint (avec `--no-trend`, et ses limites par rapport à FRAM).
 
 ## [1.0.0] — 2026-09-29

@@ -61,6 +61,7 @@ Les éléments graphiques — icônes, photos, illustrations, graphiques de donn
 8. **Images légendées** — photo + légende combinées
 9. **Thumbnails et cartes** — fusion image + contenu textuel
 10. **Boutons iconiques** — icône cliquable seule
+11. **Cartes** — `Map` (SwiftUI) : résumé, repères nommés, alternative en liste, bouton réel pour l'ouverture plein écran
 
 Voir les patterns complets dans :
 - **iOS SwiftUI** → [`ios-swiftui/patterns.swift`](./ios-swiftui/patterns.swift)

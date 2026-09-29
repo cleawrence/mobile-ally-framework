@@ -30,6 +30,7 @@ Lorsqu'un mot, une phrase ou un bloc de texte est dans une langue différente de
 Le titre d'un écran doit décrire de manière concise et pertinente la fonction ou le contenu de l'écran. Il doit également être unique parmi les différents écrans de l'application pour éviter toute confusion.
 - **iOS (SwiftUI)** : `.navigationTitle("Nom de l'écran")` pour les écrans dans une `NavigationStack`.
 - **Android (Compose)** : Utiliser un composant comme `TopAppBar(title = { Text("Nom de l'écran") })` ou injecter sémantiquement le titre de la fenêtre (`windowTitle`).
+- **Android (Compose), écrans à panneaux** : `Modifier.semantics { paneTitle = "Détail du message" }` sur chaque panneau (liste, détail) — TalkBack annonce le titre quand le panneau apparaît. Voir `patterns.kt` §5.
 
 ## À faire / À éviter
 
