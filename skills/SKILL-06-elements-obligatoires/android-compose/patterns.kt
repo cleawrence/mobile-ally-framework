@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.intl.LocaleList
@@ -105,6 +106,50 @@ fun ScreenChangeAnnouncementPattern() {
         
         Button(onClick = { step = 2 }) {
             Text("Passer au paiement")
+        }
+    }
+}
+
+// MARK: - 5. TITRE DE PANNEAU (paneTitle) [A] — Critères 6.3, 6.4
+// Sur tablette/pliable ou dans un écran à panneaux (liste + détail), il n'y a qu'un seul TopAppBar :
+// TalkBack ne sait pas qu'un panneau vient d'apparaître. `paneTitle` donne un titre à chaque panneau
+// et TalkBack l'annonce quand il entre à l'écran ou change.
+@Composable
+fun PaneTitlePattern() {
+    var selectedMessage by remember { mutableStateOf<String?>(null) }
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        // ✅ Bon: chaque panneau a un titre unique et descriptif
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .semantics { paneTitle = "Liste des messages" }
+        ) {
+            Button(onClick = { selectedMessage = "Bienvenue" }) {
+                Text("Ouvrir le message Bienvenue")
+            }
+        }
+
+        selectedMessage?.let { message ->
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    // Annoncé par TalkBack à l'apparition du panneau : « Détail du message »
+                    .semantics { paneTitle = "Détail du message" }
+            ) {
+                Text(message, style = MaterialTheme.typography.headlineSmall)
+            }
+        }
+    }
+}
+
+// ❌ Mauvais: panneau de détail qui apparaît sans titre de panneau
+// TalkBack ne dit rien : l'utilisateur ignore qu'un nouveau contenu est apparu à côté de la liste.
+@Composable
+fun BadPaneWithoutTitlePattern(message: String?) {
+    message?.let {
+        Column {
+            Text(it)
         }
     }
 }

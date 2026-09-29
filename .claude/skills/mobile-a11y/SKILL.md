@@ -93,6 +93,8 @@ Accessibility is not a separate pass at the end. Every interactive element needs
 - A swipe/long-press action with no accessible equivalent exposed (`accessibilityAction`/`customActions`) (§12)
 - Pre-recorded video/audio with no captions or transcript (§8)
 - A session timeout or auto-advancing carousel with no way to extend or pause it (§11)
+- Using `@FocusState` to move **VoiceOver** focus — it only drives keyboard focus; use `@AccessibilityFocusState` + `.accessibilityFocused(_:)` (§10)
+- A tappable map/container built with `.disabled(true)` + transparent overlay + `onTapGesture` instead of a real `Button` with a label (§1, §5)
 - **Using an accessibility API by name-guessing instead of verifying it exists** — `XCUIElement.customActions`, `XCUIElementQuery.allElements`, `XCUIAccessibilityAuditType.textClipping` and `XCUIElement.contentSize` all *sound* plausible and don't exist; every fabricated-API bug this skill's examples were built to avoid was exactly this failure mode. Grep the SDK or check the real symbol before writing an accessibility call you're not certain of.
 
 ---
@@ -106,6 +108,7 @@ Every image is either decorative or informative — never leave it unlabeled by 
 - Never start a label with "Image de", "Icône de", "Photo de" — the trait already tells the screen reader it's an image.
 - Complex graphics (charts, diagrams) need a concise summary label *plus* a way to reach the detailed data (a button, an expandable text).
 - An image with a visible caption should be one accessible element, not two separately-announced ones.
+- A map is a complex graphic: give it a summary label, named markers, a text/list alternative, and make a tappable preview a real button.
 
 ```swift
 // ✅ Decorative — invisible to VoiceOver
@@ -282,6 +285,9 @@ Text("Hello world").environment(\.locale, Locale(identifier: "en"))
 ```
 
 ```kotlin
+// ✅ Multi-pane screens (list + detail): title each pane, TalkBack announces it when it appears
+Column(Modifier.semantics { paneTitle = "Détail du message" }) { /* … */ }
+
 // ✅ Screen title as a heading, announced by TalkBack on screen entry
 Text(
     "Paramètres du compte",
@@ -317,6 +323,7 @@ Text("Section titre", modifier = Modifier.semantics { heading() })
 - Pre-recorded synchronized media needs captions (deaf/hard-of-hearing) `[A]`.
 - Pre-recorded synchronized media should offer audio description of visual-only content `[AA]`.
 - Don't rely on color/animation alone to signal "now playing" — pair with an accessible label/state.
+- Temporary messages (Snackbar/Toast) that vanish on their own are time-limited content: prefer a Snackbar with an action and a dismiss button (`SnackbarDuration.Indefinite`) for anything important, and never use `Toast` for it.
 
 ```swift
 // ✅ Expose a transcript alongside a video/audio player
@@ -374,6 +381,12 @@ OutlinedTextField(
 - Custom keyboard shortcuts must not conflict with the screen reader's own shortcuts (VoiceOver/TalkBack reserve many single-key gestures).
 
 ```swift
+// ✅ Give VoiceOver focus back to the trigger when a sheet closes (@FocusState would NOT do it)
+@AccessibilityFocusState private var triggerFocused: Bool
+Button("Filtrer") { showFilters = true }
+    .accessibilityFocused($triggerFocused)
+    .sheet(isPresented: $showFilters, onDismiss: { triggerFocused = true }, content: { FiltersView() })
+
 // ✅ Group things that should be read together in visual order, ungroup things that shouldn't
 VStack { header; content; footer }
     .accessibilityElement(children: .contain) // preserves reading order, doesn't merge into one

@@ -4,6 +4,26 @@ Toutes les évolutions notables de FRAM sont consignées ici.
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet adopte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+## [1.1.0] — 2026-09-29
+
+### Ajouté
+
+- Références vers les projets CVS Health *iOS SwiftUI Accessibility Techniques* et *Android Compose Accessibility Techniques* (README et documentation) (#31).
+- **Patterns prioritaires**, compilés par les harnesses de la CI (`swiftc -typecheck` iOS, `compileDebugKotlin` Android) (#32) :
+  - iOS SKILL-01 §8 — cartes (`Map`) : résumé, repères nommés, alternative en liste, bouton réel pour l'ouverture plein écran ;
+  - iOS SKILL-10 §8 — `@AccessibilityFocusState` : retour du focus VoiceOver après une sheet, focus sur le champ en erreur (`@FocusState` ne gère que le clavier) ;
+  - Android SKILL-06 §5 — `paneTitle` pour les écrans à panneaux ;
+  - Android SKILL-08 §5 — messages temporaires : Snackbar sans disparition automatique, `liveRegion`, et le contre-exemple `Toast`.
+  - `SKILL.md` et pages du site correspondants, et skill condensé `mobile-a11y` mis à jour.
+- Guide CI iOS : section optionnelle sur `a11y-check`, analyseur statique SwiftUI complémentaire à SwiftLint (avec `--no-trend`, et ses limites par rapport à FRAM) (#31).
+
+### Notes de mise à jour
+
+- Pour bénéficier des nouveaux patterns dans le skill Claude Code déjà installé : `npx skills update mobile-a11y` (ou le réinstaller avec `npx skills add https://github.com/cleawrence/mobile-ally-framework --skill mobile-a11y -g`).
+- Les exemples sont validés à la compilation, pas au lecteur d'écran : le comportement réel de VoiceOver / TalkBack reste à vérifier sur appareil.
+
 ## [1.0.0] — 2026-09-29
 
 Première release publiée. Elle regroupe tout l'historique du dépôt (PR #1 à #28).
@@ -41,4 +61,6 @@ Première release publiée. Elle regroupe tout l'historique du dépôt (PR #1 à
 - Les utilisateurs du skill déjà installé conservent l'ancien comportement de l'audit (écriture de la baseline sans confirmation) tant qu'ils n'ont pas lancé `npx skills update mobile-a11y`.
 - Les `skills/SKILL-XX-*/SKILL.md` sont de la documentation de référence, pas des skills installables : `npx skills add` affiche des avertissements « missing required frontmatter » à leur sujet, sans conséquence.
 
+[Non publié]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.1.0...develop
+[1.1.0]: https://github.com/cleawrence/mobile-ally-framework/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cleawrence/mobile-ally-framework/releases/tag/v1.0.0

@@ -56,6 +56,8 @@ Le focus doit rester **à l'intérieur** des modales tant qu'elles sont ouvertes
 
 Le focus doit retourner à l'élément **déclencheur** quand la modale se ferme.
 
+> ⚠️ Sur iOS, `@FocusState` gère le focus **clavier** et ne déplace pas le curseur VoiceOver. Pour rendre le focus à l'élément déclencheur (ou l'amener sur un champ en erreur), utiliser `@AccessibilityFocusState` + `.accessibilityFocused(_:)`. Voir `patterns.swift` §8.
+
 ---
 
 ## Position dans l'application

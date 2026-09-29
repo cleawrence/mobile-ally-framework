@@ -132,6 +132,16 @@ L'**audiodescription** est une narration audio supplémentaire décrivant les ac
 
 ---
 
+## Messages temporaires — Snackbar, Toast, alertes
+
+Un message qui disparaît seul est un contenu limité dans le temps (WCAG 2.2.1 `[A]`) ; un message d'état doit être annoncé (WCAG 4.1.3 `[AA]`).
+- **Android** : préférer `Snackbar` avec `actionLabel`, `withDismissAction = true` et `SnackbarDuration.Indefinite` pour un message important ; message d'état dans la page → `liveRegion = LiveRegionMode.Polite`. Éviter `Toast` pour toute information importante.
+- **iOS** : annoncer un message d'état avec `AccessibilityNotification.Announcement`, et ne pas faire disparaître seul un message porteur d'une action.
+
+Voir `android-compose/patterns.kt` §5.
+
+---
+
 ## Vérification manuelle
 
 ### Protocole Reduce Motion
