@@ -156,6 +156,29 @@ Pour le mettre à jour après une évolution du référentiel :
 npx skills update mobile-a11y
 ```
 
+**Utilisation** — le skill se déclenche automatiquement selon le contexte (écriture ou revue de code SwiftUI/Compose, mots-clés `accessibilité`, `VoiceOver`, `contentDescription`…), ou s'invoque explicitement :
+
+```
+/mobile-a11y                        # applique le pense-bête des 12 thématiques au code en cours
+/mobile-a11y <thème>                # va directement à une thématique (numéro, nom FR ou EN)
+/mobile-a11y audit <chemin>         # audite le(s) fichier(s) et rapporte les violations réelles
+/mobile-a11y audit                  # idem, sur les fichiers en cours de discussion
+```
+
+| Vous voulez... | Commande |
+|---|---|
+| Travailler une seule thématique | `/mobile-a11y 9`, `/mobile-a11y formulaires` ou `/mobile-a11y forms` |
+| Appliquer les 12 thématiques | `/mobile-a11y` |
+| Auditer un écran | `/mobile-a11y audit MonApp/Views/LoginView.swift` |
+
+Les 12 thématiques sont accessibles **une par une ou toutes ensemble** via ce seul skill : il n'y a pas 12 skills à installer séparément (les `skills/SKILL-XX-*/SKILL.md` du repo sont la documentation de référence, pas des skills installables — d'où les avertissements « missing required frontmatter » affichés par `npx skills add`, sans conséquence).
+
+Alias de thèmes : `1` images/graphiques · `2` contraste/couleurs · `3` adaptation/dynamic-type · `4` tableaux/listes · `5` interactive/composants · `6` langue/titres · `7` structure/headings · `8` media/temporels · `9` forms/formulaires · `10` navigation/focus · `11` consultation/touch-targets · `12` documentation.
+
+> ⚠️ **Baseline d'audit** : `/mobile-a11y audit` écrit un fichier de suivi `.a11y/<chemin>.json` **dans le projet audité** (statuts `🆕 Nouveau` / `⚠️ Toujours ouvert` / `✅ Corrigé` aux audits suivants). Prévoyez de le versionner, ou de l'ajouter au `.gitignore` si vous ne le souhaitez pas.
+
+Détails et exemples : [guide d'installation](docs/guides/installation.md).
+
 C'est une version condensée, pas la source de vérité — pour l'exhaustivité (critères complets, patterns ❌ commentés, règles de lint), les `skills/SKILL-XX-*/` de ce repo restent la référence.
 
 ---
